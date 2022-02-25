@@ -3,6 +3,8 @@
  *  Device Driver for Hubitat Elevation hub
  *  Version 0.2.0
  *
+ *  Ver. 0.2.1 2022-02-25 kkossev - TuyaBlackMagic for TS0003 _TZ3000_vjhcenzo 
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
  *
@@ -186,6 +188,31 @@ def deleteObsoleteChildren() {
     }
 }
 
+def tuyaBlackMagic() {
+    return zigbee.readAttribute(0x0000, [0x0004, 0x000, 0x0001, 0x0005, 0x0007, 0xfffe], [:], delay=200)    // Cluster: Basic, attributes: Man.name, ZLC ver, App ver, Model Id, Power Source, attributeReportingStatus
+}
+
+/*
+    configure() method is called: 
+       *  unconditionally during the initial pairing, immediately after Installed() method
+       *  when Initialize button is pressed
+       *  from updated() when preferencies are saved
+*/
+def configure() {
+    logDebug " configure().."
+    List<String> cmds = []
+    cmds += tuyaBlackMagic()
+    cmds += refresh()
+    cmds += zigbee.onOffConfig()
+    sendZigbeeCommands(cmds)
+}
+
+void sendZigbeeCommands(List<String> cmds) {
+    logDebug"${device.displayName} sendZigbeeCommands received : ${cmds}"
+	sendHubCommand(new hubitat.device.HubMultiAction(cmds, hubitat.device.Protocol.ZIGBEE))
+}
+
+
 def logDebug(msg) {
-    // log.debug msg
+    log.debug msg
 }
