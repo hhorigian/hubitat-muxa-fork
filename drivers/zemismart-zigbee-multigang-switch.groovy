@@ -1,9 +1,10 @@
 /**
  *  Zemismart ZigBee Wall Switch Multi-Gang
  *  Device Driver for Hubitat Elevation hub
- *  Version 0.2.0
  *
- *  Ver. 0.2.1 2022-02-25 kkossev - TuyaBlackMagic for TS0003 _TZ3000_vjhcenzo 
+ *  Based on Muxa's driver Version 0.2.0, last updated Feb 5, 2020 
+ *
+ *  Ver. 0.2.1 2022-02-26 kkossev - TuyaBlackMagic for TS0003 _TZ3000_vjhcenzo 
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -192,12 +193,6 @@ def tuyaBlackMagic() {
     return zigbee.readAttribute(0x0000, [0x0004, 0x000, 0x0001, 0x0005, 0x0007, 0xfffe], [:], delay=200)    // Cluster: Basic, attributes: Man.name, ZLC ver, App ver, Model Id, Power Source, attributeReportingStatus
 }
 
-/*
-    configure() method is called: 
-       *  unconditionally during the initial pairing, immediately after Installed() method
-       *  when Initialize button is pressed
-       *  from updated() when preferencies are saved
-*/
 def configure() {
     logDebug " configure().."
     List<String> cmds = []
@@ -214,5 +209,5 @@ void sendZigbeeCommands(List<String> cmds) {
 
 
 def logDebug(msg) {
-    log.debug msg
+    //log.debug msg
 }
