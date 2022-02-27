@@ -5,6 +5,7 @@
  *  Based on Muxa's driver Version 0.2.0, last updated Feb 5, 2020 
  *
  *  Ver. 0.2.1 2022-02-26 kkossev - TuyaBlackMagic for TS0003 _TZ3000_vjhcenzo 
+ *  Ver. 0.2.2 2022-02-27 kkossev - (development branch) 10:03 AM : TS0004 4-button version , logEnable, txtEnable
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -29,13 +30,20 @@ metadata {
         capability "Health Check"
  
         // fingerprint profileId: "0104", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0019", manufacturer: "Zemismart", model: "TS0002", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0004", manufacturer:"_TZ3000_excgg5kb"     // 4-relays module
         
         attribute "lastCheckin", "string"    
+    }
+    preferences {
+        input (name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true)
+        input (name: "txtEnable", type: "bool", title: "Enable description text logging", defaultValue: true)
     }
  
 }
 
 def initialize() {
+    if (device.getDataValue("logEnable") == null) device.updateSetting("logEnable", true)
+    if (device.getDataValue("txtEnable") == null) device.updateSetting("txtEnable", true)    
     logDebug "Initializing..."
  
     setupChildDevices()
@@ -106,12 +114,12 @@ def parse(String description) {
 }
 
 def off() {
-    log.info "Turn all child switches off"	
+    if (settings?.txtEnable) log.info "Turn all child switches off"	
     "he cmd 0x${device.deviceNetworkId} 0xFF 0x0006 0x0 {}"
 }
 
 def on() {
-    log.info "Turn all child switches on"
+    if (settings?.txtEnable) log.info "Turn all child switches on"
     "he cmd 0x${device.deviceNetworkId} 0xFF 0x0006 0x1 {}"
 }
 
@@ -144,16 +152,21 @@ def componentRefresh(childDevice) {
 }
 
 def setupChildDevices() {
-    log.debug "Parent setupChildDevices"
+    logDebug "Parent setupChildDevices"
     deleteObsoleteChildren()    
     def buttons = 0
     switch (device.data.model) {
+        case 'TS0004':
+            buttons = 4
+            break
         case 'TS0003':
             buttons = 3
             break
         case 'TS0002':
             buttons = 2
-        break
+            break
+        default :
+            break
     }
     logDebug "model: ${device.data.model} buttons: $buttons"
     createChildDevices((int)buttons)
@@ -209,5 +222,5 @@ void sendZigbeeCommands(List<String> cmds) {
 
 
 def logDebug(msg) {
-    //log.debug msg
+    if (settings?.logEnable) log.debug msg
 }
