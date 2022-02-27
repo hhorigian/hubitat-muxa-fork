@@ -5,7 +5,7 @@
  *  Based on Muxa's driver Version 0.2.0, last updated Feb 5, 2020 
  *
  *  Ver. 0.2.1 2022-02-26 kkossev - TuyaBlackMagic for TS0003 _TZ3000_vjhcenzo 
- *  Ver. 0.2.2 2022-02-27 kkossev - (development branch) 10:03 AM : TS0004 4-button version , logEnable, txtEnable
+ *  Ver. 0.2.2 2022-02-27 kkossev - (development branch) 10:03 AM : TS0004 4-button, logEnable, txtEnable, ping(), intercept cluster: E000 attrId: D001 and D002 exceptions
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -19,6 +19,9 @@
 
 import hubitat.device.HubAction
 import hubitat.device.Protocol
+
+def version() { "0.2.2" }
+def timeStamp() {"2022/02/27 10:21 AM"}
 
 metadata {
     definition (name: "Zemismart ZigBee Wall Switch Multi-Gang", namespace: "muxa", author: "Muxa") {
@@ -41,41 +44,23 @@ metadata {
  
 }
 
-def initialize() {
-    if (device.getDataValue("logEnable") == null) device.updateSetting("logEnable", true)
-    if (device.getDataValue("txtEnable") == null) device.updateSetting("txtEnable", true)    
-    logDebug "Initializing..."
- 
-    setupChildDevices()
-}
-
-def installed() {
-    logDebug "Parent installed"
-}
-
-def updated() {
-    logDebug "Parent updated"
-}
 
 // Parse incoming device messages to generate events
 
 def parse(String description) {
+   checkDriverVersion()
    //log.debug "Parsing '${description}'"
-   
-   def descMap = zigbee.parseDescriptionAsMap(description)
+   def descMap = [:] 
+   try {
+       descMap = zigbee.parseDescriptionAsMap(description)
+   }
+   catch ( e ) {
+       if (settings?.logEnable) log.warn "exception caught while parsing description ${description} \r descMap:  ${descMap}"
+       return null
+   }    
    logDebug "Parsed: $descMap"
     
    Map map = null // [:]
-   
-    // switch 1 on:
-    //dev:3902019-11-13 07:06:11.487 pm debugParsing 'read attr - raw: 7A040100060800001001, dni: 7A04, endpoint: 01, cluster: 0006, size: 08, attrId: 0000, encoding: 10, command: 0A, value: 01'
-    
-    // switch 1 off:
-    // dev:3902019-11-13 07:07:47.259 pm debugParsing 'read attr - raw: 7A040100060800001000, dni: 7A04, endpoint: 01, cluster: 0006, size: 08, attrId: 0000, encoding: 10, command: 0A, value: 00'
-    
-    // periodic reporting:
-    // dev:3902019-11-13 07:07:09.788 pm debugParsing 'read attr - raw: 7A040100000801002042, dni: 7A04, endpoint: 01, cluster: 0000, size: 08, attrId: 0001, encoding: 20, command: 0A, value: 42'
-    
         
    if (descMap.cluster == "0006" && descMap.attrId == "0000") {
        // descMap.command =="0A" - switch toggled physically
@@ -126,6 +111,10 @@ def on() {
 def refresh() {
 	logDebug "refreshing"
     "he rattr 0x${device.deviceNetworkId} 0xFF 0x0006 0x0"
+}
+
+def ping() {
+    refresh()
 }
 
 private Integer convertHexToInt(hex) {
@@ -201,6 +190,41 @@ def deleteObsoleteChildren() {
         }
     }
 }
+
+def driverVersionAndTimeStamp() {version()+' '+timeStamp()}
+
+def checkDriverVersion() {
+    if (state.driverVersion == null || (driverVersionAndTimeStamp() != state.driverVersion)) {
+        if (txtEnable==true) log.debug "${device.displayName} updating the settings from the current driver version ${state.driverVersion} to the new version ${driverVersionAndTimeStamp()}"
+        initializeVars( fullInit = false ) 
+        state.driverVersion = driverVersionAndTimeStamp()
+    }
+}
+
+void initializeVars(boolean fullInit = true) {
+    if (settings?.txtEnable) log.info "${device.displayName} InitializeVars()... fullInit = ${fullInit}"
+    if (fullInit == true ) {
+        state.clear()
+        state.driverVersion = driverVersionAndTimeStamp()
+    }
+    if (fullInit == true || device.getDataValue("logEnable") == null) device.updateSetting("logEnable", true)
+    if (fullInit == true || device.getDataValue("txtEnable") == null) device.updateSetting("txtEnable", true)    
+}
+
+def initialize() {
+    logDebug "Initializing..."
+    initializeVars(fullInit = true) 
+    setupChildDevices()
+}
+
+def installed() {
+    logDebug "Parent installed"
+}
+
+def updated() {
+    logDebug "Parent updated"
+}
+
 
 def tuyaBlackMagic() {
     return zigbee.readAttribute(0x0000, [0x0004, 0x000, 0x0001, 0x0005, 0x0007, 0xfffe], [:], delay=200)    // Cluster: Basic, attributes: Man.name, ZLC ver, App ver, Model Id, Power Source, attributeReportingStatus
