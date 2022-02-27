@@ -5,7 +5,7 @@
  *  Based on Muxa's driver Version 0.2.0, last updated Feb 5, 2020 
  *
  *  Ver. 0.2.1 2022-02-26 kkossev - TuyaBlackMagic for TS0003 _TZ3000_vjhcenzo 
- *  Ver. 0.2.2 2022-02-27 kkossev - (development branch) 10:03 AM : TS0004 4-button, logEnable, txtEnable, ping(), intercept cluster: E000 attrId: D001 and D002 exceptions
+ *  Ver. 0.2.2 2022-02-27 kkossev - (development branch) 10:03 AM : TS0004 4-button, logEnable, txtEnable, ping(), intercept cluster: E000 attrId: D001 and D002 exceptions; test relayMode
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -21,7 +21,7 @@ import hubitat.device.HubAction
 import hubitat.device.Protocol
 
 def version() { "0.2.2" }
-def timeStamp() {"2022/02/27 10:21 AM"}
+def timeStamp() {"2022/02/27 12:49 PM"}
 
 metadata {
     definition (name: "Zemismart ZigBee Wall Switch Multi-Gang", namespace: "muxa", author: "Muxa") {
@@ -34,6 +34,11 @@ metadata {
  
         // fingerprint profileId: "0104", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0019", manufacturer: "Zemismart", model: "TS0002", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0004", manufacturer:"_TZ3000_excgg5kb"     // 4-relays module
+
+        
+        command "test", [
+            [name:"relayMode",    type: "ENUM",   constraints: ["OFF", "ON", "Last state"], description: "Relay Mode"] 
+        ]
         
         attribute "lastCheckin", "string"    
     }
@@ -248,3 +253,24 @@ void sendZigbeeCommands(List<String> cmds) {
 def logDebug(msg) {
     if (settings?.logEnable) log.debug msg
 }
+
+def test(relayMode){
+    List<String> cmds = []
+    switch(relayMode) {
+        case "OFF":
+            if (settings?.logEnable) log.info "Relay state - OFF"
+     	    cmds += zigbee.command(0xEF00, 0x0, "00010e04000100")
+            break
+        case "ON":
+            if (settings?.logEnable) log.info "Relay state - ON"
+ 	        cmds += zigbee.command(0xEF00, 0x0, "00010e04000101")
+            break
+        case "Last state":
+            if (settings?.logEnable) log.info "Relay state - last state"
+ 	        cmds += zigbee.command(0xEF00, 0x0, "00010e04000102")
+            break
+    }
+    sendZigbeeCommands(cmds)
+}
+
+
