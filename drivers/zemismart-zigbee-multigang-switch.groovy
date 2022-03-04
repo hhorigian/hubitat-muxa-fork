@@ -5,7 +5,8 @@
  *  Based on Muxa's driver Version 0.2.0, last updated Feb 5, 2020 
  *
  *  Ver. 0.2.1 2022-02-26 kkossev - TuyaBlackMagic for TS0003 _TZ3000_vjhcenzo 
- *  Ver. 0.2.2 2022-02-27 kkossev - (development branch) 10:03 AM : TS0004 4-button, logEnable, txtEnable, ping(), intercept cluster: E000 attrId: D001 and D002 exceptions; test relayMode
+ *  Ver. 0.2.2 2022-02-27 kkossev - (development branch) 10:03 AM : TS0004 4-button, logEnable, txtEnable, ping(), intercept cluster: E000 attrId: D001 and D002 exceptions;
+ *  Ver. 0.2.3 2022-03-04 kkossev - Power outage options
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -20,8 +21,8 @@
 import hubitat.device.HubAction
 import hubitat.device.Protocol
 
-def version() { "0.2.2" }
-def timeStamp() {"2022/02/27 12:49 PM"}
+def version() { "0.2.3" }
+def timeStamp() {"2022/02/27 5:07 PM"} 
 
 metadata {
     definition (name: "Zemismart ZigBee Wall Switch Multi-Gang", namespace: "muxa", author: "Muxa") {
@@ -256,21 +257,20 @@ def logDebug(msg) {
 
 def test(relayMode){
     List<String> cmds = []
+    int modeEnum
     switch(relayMode) {
         case "OFF":
-            if (settings?.logEnable) log.info "Relay state - OFF"
-     	    cmds += zigbee.command(0xEF00, 0x0, "00010e04000100")
+            modeEnum = 0
             break
         case "ON":
-            if (settings?.logEnable) log.info "Relay state - ON"
- 	        cmds += zigbee.command(0xEF00, 0x0, "00010e04000101")
+            modeEnum = 1
             break
         case "Last state":
-            if (settings?.logEnable) log.info "Relay state - last state"
- 	        cmds += zigbee.command(0xEF00, 0x0, "00010e04000102")
+            modeEnum = 2
             break
     }
+    cmds += zigbee.writeAttribute(0x0006, 0x8002,  0x30 /*DataType.UINT8*/, modeEnum)
     sendZigbeeCommands(cmds)
-}
+} 
 
 
