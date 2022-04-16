@@ -7,6 +7,7 @@
  *  Ver. 0.2.1 2022-02-26 kkossev - TuyaBlackMagic for TS0003 _TZ3000_vjhcenzo 
  *  Ver. 0.2.2 2022-02-27 kkossev - (development branch) 10:03 AM : TS0004 4-button, logEnable, txtEnable, ping(), intercept cluster: E000 attrId: D001 and D002 exceptions;
  *  Ver. 0.2.3 2022-03-04 kkossev - Power outage options
+ *  Ver. 0.2.4 2022-04-16 kkossev - _TZ3000_w58g68s3 Yagusmart 3 gang zigbee switch fingerprint
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -22,7 +23,7 @@ import hubitat.device.HubAction
 import hubitat.device.Protocol
 
 def version() { "0.2.3" }
-def timeStamp() {"2022/02/27 5:07 PM"} 
+def timeStamp() {"2022/04/16 10:03 PM"}
 
 metadata {
     definition (name: "Zemismart ZigBee Wall Switch Multi-Gang", namespace: "muxa", author: "Muxa") {
@@ -35,7 +36,7 @@ metadata {
  
         // fingerprint profileId: "0104", inClusters: "0000, 0003, 0004, 0005, 0006", outClusters: "0019", manufacturer: "Zemismart", model: "TS0002", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0004", manufacturer:"_TZ3000_excgg5kb"     // 4-relays module
-
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0004", manufacturer:"_TZ3000_w58g68s3"     // Yagusmart 3 gang zigbee switch
         
         command "test", [
             [name:"relayMode",    type: "ENUM",   constraints: ["OFF", "ON", "Last state"], description: "Relay Mode"] 
@@ -271,6 +272,6 @@ def test(relayMode){
     }
     cmds += zigbee.writeAttribute(0x0006, 0x8002,  0x30 /*DataType.UINT8*/, modeEnum)
     sendZigbeeCommands(cmds)
-} 
+}
 
 
