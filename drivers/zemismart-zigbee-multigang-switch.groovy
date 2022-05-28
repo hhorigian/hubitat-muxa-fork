@@ -26,7 +26,7 @@ import hubitat.device.HubAction
 import hubitat.device.Protocol
 
 def version() { "0.2.5" }
-def timeStamp() {"2022/05/28 10:47 PM"}
+def timeStamp() {"2022/05/28 11:34 PM"}
 
 metadata {
     definition (name: "Zemismart ZigBee Wall Switch Multi-Gang", namespace: "muxa", author: "Muxa") {
@@ -317,7 +317,7 @@ def logDebug(msg) {
     if (settings?.logEnable) log.debug msg
 }
 
-def relayMode(relayMode){
+def powerOnState(relayMode) {
     List<String> cmds = []
     int modeEnum
     switch(relayMode) {
