@@ -7,10 +7,12 @@
  *  Ver. 0.0.1 2019-08-21 Muxa    - first version
  *  Ver. 0.1.0 2020-02-05 Muxa    - Driver name "Zemismart ZigBee Wall Switch Multi-Gang"
  *  Ver. 0.2.1 2022-02-26 kkossev - TuyaBlackMagic for TS0003 _TZ3000_vjhcenzo 
- *  Ver. 0.2.2 2022-02-27 kkossev - (development branch) 10:03 AM : TS0004 4-button, logEnable, txtEnable, ping(), intercept cluster: E000 attrId: D001 and D002 exceptions;
- *  Ver. 0.2.3 2022-03-04 kkossev - Power outage options
+ *  Ver. 0.2.2 2022-02-27 kkossev - TS0004 4-button, logEnable, txtEnable, ping(), intercept cluster: E000 attrId: D001 and D002 exceptions;
+ *  Ver. 0.2.3 2022-03-04 kkossev - powerOnState options
  *  Ver. 0.2.4 2022-04-16 kkossev - _TZ3000_w58g68s3 Yagusmart 3 gang zigbee switch fingerprint
  *  Ver. 0.2.5 2022-05-28 kkossev - _TYZB01_Lrjzz1UV Zemismart 3 gang zigbee switch fingerprint; added TS0011 TS0012 TS0013 models and fingerprints; more TS002, TS003, TS004 manufacturers
+ *  Ver. 0.2.6 2022-06-03 kkossev -  (development branch) powerOnState and Debug logs improvements; importUrl; singleThreaded
+ *                                    TODO: EP1 on/off events are duplicated?
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -25,11 +27,11 @@
 import hubitat.device.HubAction
 import hubitat.device.Protocol
 
-def version() { "0.2.5" }
-def timeStamp() {"2022/05/28 11:34 PM"}
+def version() { "0.2.6" }
+def timeStamp() {"2022/06/03 11:19 AM"}
 
 metadata {
-    definition (name: "Zemismart ZigBee Wall Switch Multi-Gang", namespace: "muxa", author: "Muxa") {
+    definition (name: "Zemismart ZigBee Wall Switch Multi-Gang", namespace: "muxa", author: "Muxa", importUrl: "https://raw.githubusercontent.com/kkossev/hubitat-muxa-fork/development/drivers/zemismart-zigbee-multigang-switch.groovy", singleThreaded: true ) {
         capability "Initialize"
         capability "Actuator"
         capability "Configuration"
@@ -94,7 +96,7 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0013", manufacturer:"_TZ3000_k44bsygw", deviceJoinName: "Zemismart Zigbee Switch No Neutral" // check! 
         
         command "powerOnState", [
-            [name:"powerOnState",    type: "ENUM",   constraints: ["OFF", "ON", "Last state"], description: "Select Power On State"] 
+            [name:"powerOnState",    type: "ENUM",   constraints: ["--- Select ---", "OFF", "ON", "Last state"], description: "Select Power On State"] 
         ]
         
         attribute "lastCheckin", "string"    
@@ -111,13 +113,13 @@ metadata {
 
 def parse(String description) {
    checkDriverVersion()
-   //log.debug "Parsing '${description}'"
+   //log.debug "${device.displayName} Parsing '${description}'"
    def descMap = [:] 
    try {
        descMap = zigbee.parseDescriptionAsMap(description)
    }
    catch ( e ) {
-       if (settings?.logEnable) log.warn "exception caught while parsing description ${description} \r descMap:  ${descMap}"
+       if (settings?.logEnable) log.warn "${device.displayName} exception caught while parsing description ${description} \r descMap:  ${descMap}"
        return null
    }    
    logDebug "Parsed: $descMap"
@@ -129,14 +131,15 @@ def parse(String description) {
        // descMap.command =="01" - get switch status
        def cd = getChildDevice("${device.id}-${descMap.endpoint}")
        if (cd == null) {
-           log.warn "Child device ${device.id}-${descMap.endpoint} not found. Initialise parent device first"
+           log.warn "${device.displayName} Child device ${device.id}-${descMap.endpoint} not found. Initialise parent device first"
            return
        }
        def switchAttribute = descMap.value == "01" ? "on" : "off"
        if (descMap.command =="0A") {
            // switch toggled
            cd.parse([[name: "switch", value:switchAttribute, descriptionText: "Child switch ${descMap.endpoint} turned $switchAttribute"]])
-       } else if (descMap.command =="01") {
+       } 
+       else if (descMap.command =="01") {
            // report switch status
            cd.parse([[name: "switch", value:switchAttribute, descriptionText: "Child switch  ${descMap.endpoint} is $switchAttribute"]])
        }
@@ -144,7 +147,8 @@ def parse(String description) {
        if (switchAttribute == "on") {
            logDebug "Parent switch on"
            return createEvent(name: "switch", value: "on")
-       } else if (switchAttribute == "off") {
+       } 
+       else if (switchAttribute == "off") {
             def cdsOn = 0
             // cound number of switches on
             getChildDevices().each {child ->
@@ -157,16 +161,22 @@ def parse(String description) {
                 return createEvent(name: "switch", value: "off")
             }
        }
-   }
+    } // OnOff cluster, attrId "0000"
+    else if (descMap.cluster == "0006" && descMap.attrId != "0000") { // other attr
+        processOnOfClusterOtherAttr( descMap )
+    }
+    else {
+        logDebug "<b>UNPROCESSED</b> EP: ${descMap.endpoint} cluster: ${descMap.cluster} attrId: ${descMap.attrId}"
+    }
 }
 
 def off() {
-    if (settings?.txtEnable) log.info "Turn all child switches off"	
+    if (settings?.txtEnable) log.info "${device.displayName} Turning all child switches off"	
     "he cmd 0x${device.deviceNetworkId} 0xFF 0x0006 0x0 {}"
 }
 
 def on() {
-    if (settings?.txtEnable) log.info "Turn all child switches on"
+    if (settings?.txtEnable) log.info "${device.displayName} Turning all child switches on"
     "he cmd 0x${device.deviceNetworkId} 0xFF 0x0006 0x1 {}"
 }
 
@@ -240,9 +250,9 @@ def createChildDevices(int buttons) {
         def existingChild = getChildDevices()?.find { it.deviceNetworkId == childId}
     
         if (existingChild) {
-            log.info "Child device ${childId} already exists (${existingChild})"
+            log.info "${device.displayName} Child device ${childId} already exists (${existingChild})"
         } else {
-            log.info "Creatung device ${childId}"
+            log.info "${device.displayName} Creatung device ${childId}"
             addChildDevice("hubitat", "Generic Component Switch", childId, [isComponent: true, name: "Switch EP0${i}", label: "${device.displayName} EP0${i}"])
         }
     }
@@ -253,7 +263,7 @@ def deleteObsoleteChildren() {
     
     getChildDevices().each {child->
         if (!child.deviceNetworkId.startsWith(device.id) || child.deviceNetworkId == "${device.id}-00") {
-            log.info "Deleting ${child.deviceNetworkId}"
+            log.info "${device.displayName} Deleting ${child.deviceNetworkId}"
   		    deleteChildDevice(child.deviceNetworkId)
         }
     }
@@ -308,18 +318,19 @@ def configure() {
 }
 
 void sendZigbeeCommands(List<String> cmds) {
-    logDebug"${device.displayName} sendZigbeeCommands received : ${cmds}"
+    logDebug "sendZigbeeCommands received : ${cmds}"
 	sendHubCommand(new hubitat.device.HubMultiAction(cmds, hubitat.device.Protocol.ZIGBEE))
 }
 
 
 def logDebug(msg) {
-    if (settings?.logEnable) log.debug msg
+    String sDnMsg = device.displayName + " " + msg
+    if (settings?.logEnable) log.debug sDnMsg
 }
 
 def powerOnState(relayMode) {
     List<String> cmds = []
-    int modeEnum
+    int modeEnum = 99
     switch(relayMode) {
         case "OFF" :
             modeEnum = 0
@@ -330,9 +341,36 @@ def powerOnState(relayMode) {
         case "Last state" :
             modeEnum = 2
             break
+        default :
+            log.error "${device.displayName} please select a Power On State option"
+            return
     }
-    cmds += zigbee.writeAttribute(0x0006, 0x8002,  0x30 /*DataType.UINT8*/, modeEnum)
+    logDebug ("setting  Power On State option to: ${relayMode}")
+    cmds += zigbee.writeAttribute(0x0006, 0x8002,  DataType.ENUM8, modeEnum)
     sendZigbeeCommands(cmds)
 }
 
-
+def processOnOfClusterOtherAttr( descMap ) {
+    logDebug "cluster OnOff  attribute ${descMap.attrId} reported: value=${descMap.value}"
+    def mode
+    def attrName
+    def value = descMap.value as int
+    switch (descMap.attrId) {
+        case "8000" :    // command "childLock", [[name:"Child Lock", type: "ENUM", description: "Select Child Lock mode", constraints: ["off", "on"]]]
+            attrName = "Child Lock"
+            mode = value == 0 ? "off" : "on"
+            break
+        case "8001" :    // command "ledMode", [[name:"LED mode", type: "ENUM", description: "Select LED mode", constraints: ["Disabled", "Lit when On", "Lit when Off", "Always Green", "Red when On; Green when Off", "Green when On; Red when Off", "Always Red" ]]]
+            attrName = "LED mode"
+            mode = value == 0 ? "Disabled"  : value == 1 ? "Lit when On" : value == 2 ? "Lit when Off" : null
+            break
+        case "8002" :    // command "powerOnState", [[name:"Power On State", type: "ENUM", description: "Select Power On State", constraints: ["off","on", "Last state"]]]
+            attrName = "Power On State"
+            mode = value == 0 ? "off" : value == 1 ? "on" : value == 2 ?  "Last state" : null
+            break
+        default :
+            logDebug "processOnOfClusterOtherAttr: <b>UNPROCESSED On/Off Cluster</b>  attrId: ${descMap.attrId} value: ${descMap.value}"
+            break
+    }
+    if (txtEnable) log.info "${device.displayName} ${attrName} is: ${mode}"    
+}
