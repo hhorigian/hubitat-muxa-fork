@@ -12,6 +12,7 @@
  *  Ver. 0.2.4 2022-04-16 kkossev - _TZ3000_w58g68s3 Yagusmart 3 gang zigbee switch fingerprint
  *  Ver. 0.2.5 2022-05-28 kkossev - _TYZB01_Lrjzz1UV Zemismart 3 gang zigbee switch fingerprint; added TS0011 TS0012 TS0013 models and fingerprints; more TS002, TS003, TS004 manufacturers
  *  Ver. 0.2.6 2022-06-03 kkossev -  (development branch) powerOnState and Debug logs improvements; importUrl; singleThreaded
+ *  Ver. 0.2.7 2022-06-05 kkossev -  (development branch) command '0B' (command response) bug fix
  *                                    TODO: EP1 on/off events are duplicated?
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
@@ -27,8 +28,8 @@
 import hubitat.device.HubAction
 import hubitat.device.Protocol
 
-def version() { "0.2.6" }
-def timeStamp() {"2022/06/03 11:19 AM"}
+def version() { "0.2.7" }
+def timeStamp() {"2022/06/05 12:15 AM"}
 
 metadata {
     definition (name: "Zemismart ZigBee Wall Switch Multi-Gang", namespace: "muxa", author: "Muxa", importUrl: "https://raw.githubusercontent.com/kkossev/hubitat-muxa-fork/development/drivers/zemismart-zigbee-multigang-switch.groovy", singleThreaded: true ) {
@@ -129,13 +130,14 @@ def parse(String description) {
    if (descMap.cluster == "0006" && descMap.attrId == "0000") {
        // descMap.command =="0A" - switch toggled physically
        // descMap.command =="01" - get switch status
+       // descMap.command =="0B" - command response
        def cd = getChildDevice("${device.id}-${descMap.endpoint}")
        if (cd == null) {
            log.warn "${device.displayName} Child device ${device.id}-${descMap.endpoint} not found. Initialise parent device first"
            return
        }
        def switchAttribute = descMap.value == "01" ? "on" : "off"
-       if (descMap.command =="0A") {
+       if (descMap.command in ["0A", "0B"]) {
            // switch toggled
            cd.parse([[name: "switch", value:switchAttribute, descriptionText: "Child switch ${descMap.endpoint} turned $switchAttribute"]])
        } 
@@ -198,17 +200,17 @@ private String getChildId(childDevice) {
 }
 
 def componentOn(childDevice) {
-    logDebug "componentOn ${childDevice.deviceNetworkId}"
+    logDebug "sending componentOn ${childDevice.deviceNetworkId}"
     sendHubCommand(new HubAction("he cmd 0x${device.deviceNetworkId} 0x${getChildId(childDevice)} 0x0006 0x1 {}", Protocol.ZIGBEE))
 }
 
 def componentOff(childDevice) {
-    logDebug "componentOff ${childDevice.deviceNetworkId}"
+    logDebug "sending componentOff ${childDevice.deviceNetworkId}"
     sendHubCommand(new HubAction("he cmd 0x${device.deviceNetworkId} 0x${getChildId(childDevice)} 0x0006 0x0 {}", Protocol.ZIGBEE))
 }
 
 def componentRefresh(childDevice) {
-    logDebug "componentRefresh ${childDevice.deviceNetworkId} ${childDevice}"    
+    logDebug "sending componentRefresh ${childDevice.deviceNetworkId} ${childDevice}"    
     sendHubCommand(new HubAction("he rattr 0x${device.deviceNetworkId} 0x${getChildId(childDevice)} 0x0006 0x0", Protocol.ZIGBEE))
 }
 
