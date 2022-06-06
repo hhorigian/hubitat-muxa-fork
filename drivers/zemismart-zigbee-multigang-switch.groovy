@@ -12,8 +12,7 @@
  *  Ver. 0.2.4 2022-04-16 kkossev - _TZ3000_w58g68s3 Yagusmart 3 gang zigbee switch fingerprint
  *  Ver. 0.2.5 2022-05-28 kkossev - _TYZB01_Lrjzz1UV Zemismart 3 gang zigbee switch fingerprint; added TS0011 TS0012 TS0013 models and fingerprints; more TS002, TS003, TS004 manufacturers
  *  Ver. 0.2.6 2022-06-03 kkossev -  (development branch) powerOnState and Debug logs improvements; importUrl; singleThreaded
- *  Ver. 0.2.7 2022-06-05 kkossev -  (development branch) command '0B' (command response) bug fix
- *                                    TODO: EP1 on/off events are duplicated?
+ *  Ver. 0.2.7 2022-06-06 kkossev -  (development branch) command '0B' (command response) bug fix; added Tuya Zugbee mini switch TMZ02L (_TZ3000_txpirhfq); bug fix for TS001 single-gang switches.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -29,7 +28,7 @@ import hubitat.device.HubAction
 import hubitat.device.Protocol
 
 def version() { "0.2.7" }
-def timeStamp() {"2022/06/05 12:15 AM"}
+def timeStamp() {"2022/06/06 9:42 AM"}
 
 metadata {
     definition (name: "Zemismart ZigBee Wall Switch Multi-Gang", namespace: "muxa", author: "Muxa", importUrl: "https://raw.githubusercontent.com/kkossev/hubitat-muxa-fork/development/drivers/zemismart-zigbee-multigang-switch.groovy", singleThreaded: true ) {
@@ -75,6 +74,7 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0004", manufacturer:"_TZ3000_w58g68s3"  // Yagusmart 3 gang zigbee switch
         
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0011", manufacturer:"_TZ3000_ybaprszv", deviceJoinName: "Zemismart Zigbee Switch No Neutral"  
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019",      model:"TS0011", manufacturer:"_TZ3000_txpirhfq", deviceJoinName: "Tuya Zugbee Mini Switch TMZ02L"  
 
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0001,0007,0000,0003,0004,0005,0006,E000,E001,0002", outClusters:"0019,000A", model:"TS0012", manufacturer:"_TZ3000_k008kbls", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang" // check! 
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0012", manufacturer:"_TZ3000_uz5xzdgy", deviceJoinName: "Zemismart Zigbee Switch No Neutral"
@@ -133,19 +133,22 @@ def parse(String description) {
        // descMap.command =="0B" - command response
        def cd = getChildDevice("${device.id}-${descMap.endpoint}")
        if (cd == null) {
-           log.warn "${device.displayName} Child device ${device.id}-${descMap.endpoint} not found. Initialise parent device first"
-           return
+           if (!(device.data.model  in ['TS0011'])) {
+               log.warn "${device.displayName} Child device ${device.id}-${descMap.endpoint} not found. Initialise parent device first"
+               return
+           }
        }
        def switchAttribute = descMap.value == "01" ? "on" : "off"
-       if (descMap.command in ["0A", "0B"]) {
-           // switch toggled
-           cd.parse([[name: "switch", value:switchAttribute, descriptionText: "Child switch ${descMap.endpoint} turned $switchAttribute"]])
-       } 
-       else if (descMap.command =="01") {
-           // report switch status
-           cd.parse([[name: "switch", value:switchAttribute, descriptionText: "Child switch  ${descMap.endpoint} is $switchAttribute"]])
+       if (cd != null ) {
+           if (descMap.command in ["0A", "0B"]) {
+               // switch toggled
+               cd.parse([[name: "switch", value:switchAttribute, descriptionText: "Child switch ${descMap.endpoint} turned $switchAttribute"]])
+           } 
+           else if (descMap.command =="01") {
+               // report switch status
+               cd.parse([[name: "switch", value:switchAttribute, descriptionText: "Child switch  ${descMap.endpoint} is $switchAttribute"]])
+           }
        }
-       
        if (switchAttribute == "on") {
            logDebug "Parent switch on"
            return createEvent(name: "switch", value: "on")
