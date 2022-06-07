@@ -12,7 +12,7 @@
  *  Ver. 0.2.4 2022-04-16 kkossev - _TZ3000_w58g68s3 Yagusmart 3 gang zigbee switch fingerprint
  *  Ver. 0.2.5 2022-05-28 kkossev - _TYZB01_Lrjzz1UV Zemismart 3 gang zigbee switch fingerprint; added TS0011 TS0012 TS0013 models and fingerprints; more TS002, TS003, TS004 manufacturers
  *  Ver. 0.2.6 2022-06-03 kkossev -  (development branch) powerOnState and Debug logs improvements; importUrl; singleThreaded
- *  Ver. 0.2.7 2022-06-06 kkossev -  (development branch) command '0B' (command response) bug fix; added Tuya Zugbee mini switch TMZ02L (_TZ3000_txpirhfq); bug fix for TS001 single-gang switches.
+ *  Ver. 0.2.7 2022-06-06 kkossev -  (development branch) command '0B' (command response) bug fix; added Tuya Zugbee mini switch TMZ02L (_TZ3000_txpirhfq); bug fix for TS0011 single-gang switches.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -28,7 +28,7 @@ import hubitat.device.HubAction
 import hubitat.device.Protocol
 
 def version() { "0.2.7" }
-def timeStamp() {"2022/06/06 9:42 AM"}
+def timeStamp() {"2022/06/06 9:47 AM"}
 
 metadata {
     definition (name: "Zemismart ZigBee Wall Switch Multi-Gang", namespace: "muxa", author: "Muxa", importUrl: "https://raw.githubusercontent.com/kkossev/hubitat-muxa-fork/development/drivers/zemismart-zigbee-multigang-switch.groovy", singleThreaded: true ) {
@@ -74,8 +74,8 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0004", manufacturer:"_TZ3000_w58g68s3"  // Yagusmart 3 gang zigbee switch
         
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0011", manufacturer:"_TZ3000_ybaprszv", deviceJoinName: "Zemismart Zigbee Switch No Neutral"  
-        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019",      model:"TS0011", manufacturer:"_TZ3000_txpirhfq", deviceJoinName: "Tuya Zugbee Mini Switch TMZ02L"  
-
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0011", manufacturer:"_TZ3000_txpirhfq", deviceJoinName: "Tuya Zigbee Mini Switch TMZ02L"  
+        
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0001,0007,0000,0003,0004,0005,0006,E000,E001,0002", outClusters:"0019,000A", model:"TS0012", manufacturer:"_TZ3000_k008kbls", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang" // check! 
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0012", manufacturer:"_TZ3000_uz5xzdgy", deviceJoinName: "Zemismart Zigbee Switch No Neutral"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0004,0005,0006",                outClusters:"0019,000A", model:"TS0012", manufacturer:"_TZ3000_fvh3pjaz", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
@@ -290,8 +290,8 @@ void initializeVars(boolean fullInit = true) {
         state.clear()
         state.driverVersion = driverVersionAndTimeStamp()
     }
-    if (fullInit == true || settings?.logEnable == null) device.updateSetting("logEnable", true)
-    if (fullInit == true || settings?.txtEnable == null) device.updateSetting("txtEnable", true)    
+    if (settings?.logEnable == null) device.updateSetting("logEnable", true)
+    if (settings?.txtEnable == null) device.updateSetting("txtEnable", true)    
 }
 
 def initialize() {
@@ -361,15 +361,15 @@ def processOnOfClusterOtherAttr( descMap ) {
     def attrName
     def value = descMap.value as int
     switch (descMap.attrId) {
-        case "8000" :    // command "childLock", [[name:"Child Lock", type: "ENUM", description: "Select Child Lock mode", constraints: ["off", "on"]]]
+        case "8000" :
             attrName = "Child Lock"
             mode = value == 0 ? "off" : "on"
             break
-        case "8001" :    // command "ledMode", [[name:"LED mode", type: "ENUM", description: "Select LED mode", constraints: ["Disabled", "Lit when On", "Lit when Off", "Always Green", "Red when On; Green when Off", "Green when On; Red when Off", "Always Red" ]]]
+        case "8001" :
             attrName = "LED mode"
             mode = value == 0 ? "Disabled"  : value == 1 ? "Lit when On" : value == 2 ? "Lit when Off" : null
             break
-        case "8002" :    // command "powerOnState", [[name:"Power On State", type: "ENUM", description: "Select Power On State", constraints: ["off","on", "Last state"]]]
+        case "8002" :
             attrName = "Power On State"
             mode = value == 0 ? "off" : value == 1 ? "on" : value == 2 ?  "Last state" : null
             break
