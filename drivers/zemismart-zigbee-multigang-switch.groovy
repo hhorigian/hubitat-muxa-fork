@@ -317,8 +317,9 @@ def configure() {
     logDebug " configure().."
     List<String> cmds = []
     cmds += tuyaBlackMagic()
-    cmds += refresh()
+    //cmds += refresh()
     cmds += zigbee.onOffConfig()
+    cmds += zigbee.onOffRefresh()
     sendZigbeeCommands(cmds)
 }
 
