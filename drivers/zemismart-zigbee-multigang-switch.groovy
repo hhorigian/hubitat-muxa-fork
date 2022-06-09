@@ -11,8 +11,8 @@
  *  Ver. 0.2.3 2022-03-04 kkossev - powerOnState options
  *  Ver. 0.2.4 2022-04-16 kkossev - _TZ3000_w58g68s3 Yagusmart 3 gang zigbee switch fingerprint
  *  Ver. 0.2.5 2022-05-28 kkossev - _TYZB01_Lrjzz1UV Zemismart 3 gang zigbee switch fingerprint; added TS0011 TS0012 TS0013 models and fingerprints; more TS002, TS003, TS004 manufacturers
- *  Ver. 0.2.6 2022-06-03 kkossev -  (development branch) powerOnState and Debug logs improvements; importUrl; singleThreaded
- *  Ver. 0.2.7 2022-06-06 kkossev -  (development branch) command '0B' (command response) bug fix; added Tuya Zugbee mini switch TMZ02L (_TZ3000_txpirhfq); bug fix for TS0011 single-gang switches.
+ *  Ver. 0.2.6 2022-06-03 kkossev -  powerOnState and Debug logs improvements; importUrl; singleThreaded
+ *  Ver. 0.2.7 2022-06-06 kkossev -  command '0B' (command response) bug fix; added Tuya Zugbee mini switch TMZ02L (_TZ3000_txpirhfq); bug fix for TS0011 single-gang switches.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -28,7 +28,7 @@ import hubitat.device.HubAction
 import hubitat.device.Protocol
 
 def version() { "0.2.7" }
-def timeStamp() {"2022/06/06 9:47 AM"}
+def timeStamp() {"2022/06/06 9:48 AM"}
 
 metadata {
     definition (name: "Zemismart ZigBee Wall Switch Multi-Gang", namespace: "muxa", author: "Muxa", importUrl: "https://raw.githubusercontent.com/kkossev/hubitat-muxa-fork/development/drivers/zemismart-zigbee-multigang-switch.groovy", singleThreaded: true ) {
@@ -171,7 +171,7 @@ def parse(String description) {
         processOnOfClusterOtherAttr( descMap )
     }
     else {
-        logDebug "<b>UNPROCESSED</b> EP: ${descMap.endpoint} cluster: ${descMap.cluster} attrId: ${descMap.attrId}"
+        logDebug "${device.displayName} unprocessed EP: ${descMap.sourceEndpoint} cluster: ${descMap.clusterId} attrId: ${descMap.attrId}"
     }
 }
 
