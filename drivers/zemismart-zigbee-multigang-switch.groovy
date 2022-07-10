@@ -13,6 +13,7 @@
  *  Ver. 0.2.5 2022-05-28 kkossev - _TYZB01_Lrjzz1UV Zemismart 3 gang zigbee switch fingerprint; added TS0011 TS0012 TS0013 models and fingerprints; more TS002, TS003, TS004 manufacturers
  *  Ver. 0.2.6 2022-06-03 kkossev -  powerOnState and Debug logs improvements; importUrl; singleThreaded
  *  Ver. 0.2.7 2022-06-06 kkossev -  command '0B' (command response) bug fix; added Tuya Zugbee mini switch TMZ02L (_TZ3000_txpirhfq); bug fix for TS0011 single-gang switches.
+ *  Ver. 0.2.8 2022-07-10 kkossev -  (dev branch) - added _TZ3000_18ejxno0 and _TZ3000_qewo8dlz fingerprints
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -26,9 +27,12 @@
 
 import hubitat.device.HubAction
 import hubitat.device.Protocol
+import groovy.transform.Field
 
-def version() { "0.2.7" }
-def timeStamp() {"2022/06/06 9:48 AM"}
+def version() { "0.2.8" }
+def timeStamp() {"2022/07/10 8:55 AM"}
+
+@Field static final Boolean debug = false
 
 metadata {
     definition (name: "Zemismart ZigBee Wall Switch Multi-Gang", namespace: "muxa", author: "Muxa", importUrl: "https://raw.githubusercontent.com/kkossev/hubitat-muxa-fork/development/drivers/zemismart-zigbee-multigang-switch.groovy", singleThreaded: true ) {
@@ -81,6 +85,7 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0004,0005,0006",                outClusters:"0019,000A", model:"TS0012", manufacturer:"_TZ3000_fvh3pjaz", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0004,0005,0006,EF00",           outClusters:"0019,000A", model:"TS0012", manufacturer:"_TZ3000_lupfd8zu", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001",      outClusters:"0019,000A", model:"TS0012", manufacturer:"_TZ3000_jl7qyupf", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006,E000,E001", outClusters:"0019,000A", model:"TS0012", manufacturer:"_TZ3000_18ejxno0", deviceJoinName: "Tuya Zigbee Switch Multi-Gang"     // @dingyang.yee
         
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0006",                     outClusters:"0019",      model:"TS0013", manufacturer:"_TYZB01_Lrjzz1UV", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  // check!
         
@@ -94,7 +99,9 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0006",                     outClusters:"0019",      model:"TS0013", manufacturer:"_TYZB01_mtlhqn48", deviceJoinName: "Lonsonho Zigbee Switch Multi-Gang" // check!
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0006",                     outClusters:"0019",      model:"TS0013", manufacturer:"TUYATEC-O6SNCwd6", deviceJoinName: "TUYATEC Zigbee Switch Multi-Gang" // check! 
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0006",                     outClusters:"0019",      model:"TS0013", manufacturer:"_TZ3000_h34ihclt", deviceJoinName: "Tuya Zigbee Switch Multi-Gang"  // check!
-        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0013", manufacturer:"_TZ3000_k44bsygw", deviceJoinName: "Zemismart Zigbee Switch No Neutral" // check! 
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0013", manufacturer:"_TZ3000_k44bsygw", deviceJoinName: "Zemismart Zigbee Switch No Neutral"
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,0000",           outClusters:"0019,000A", model:"TS0013", manufacturer:"_TZ3000_qewo8dlz", deviceJoinName: "Tuya Zigbee Switch 3 Gang No Neutral"    // @dingyang.yee https://www.aliexpress.com/item/4000298926256.html https://github.com/Koenkk/zigbee2mqtt/issues/6138#issuecomment-774720939
+        
         
         command "powerOnState", [
             [name:"powerOnState",    type: "ENUM",   constraints: ["--- Select ---", "OFF", "ON", "Last state"], description: "Select Power On State"] 
