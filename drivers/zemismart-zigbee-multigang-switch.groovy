@@ -13,7 +13,7 @@
  *  Ver. 0.2.5 2022-05-28 kkossev - _TYZB01_Lrjzz1UV Zemismart 3 gang zigbee switch fingerprint; added TS0011 TS0012 TS0013 models and fingerprints; more TS002, TS003, TS004 manufacturers
  *  Ver. 0.2.6 2022-06-03 kkossev -  powerOnState and Debug logs improvements; importUrl; singleThreaded
  *  Ver. 0.2.7 2022-06-06 kkossev -  command '0B' (command response) bug fix; added Tuya Zugbee mini switch TMZ02L (_TZ3000_txpirhfq); bug fix for TS0011 single-gang switches.
- *  Ver. 0.2.8 2022-07-10 kkossev -  (dev branch) - added _TZ3000_18ejxno0 and _TZ3000_qewo8dlz fingerprints
+ *  Ver. 0.2.8 2022-07-13 kkossev -  (dev branch) - added _TZ3000_18ejxno0 and _TZ3000_qewo8dlz fingerprints; added TS0001 wall switches fingerprints; added TS011F 2-gang wall outlets; added switchType configuration
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -30,7 +30,7 @@ import hubitat.device.Protocol
 import groovy.transform.Field
 
 def version() { "0.2.8" }
-def timeStamp() {"2022/07/10 8:55 AM"}
+def timeStamp() {"2022/07/13 9:56 PM"}
 
 @Field static final Boolean debug = false
 
@@ -42,6 +42,16 @@ metadata {
         capability "Refresh"
         capability "Switch"
         capability "Health Check"
+        
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0001", manufacturer:"_TZ3000_npzfdcof", deviceJoinName: "Tuya Zigbee Switch"                  // https://www.aliexpress.com/item/1005002852788275.html
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0001", manufacturer:"_TZ3000_hktqahrq", deviceJoinName: "Tuya Zigbee Switch"
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0001", manufacturer:"_TZ3000_mx3vgyea", deviceJoinName: "Tuya Zigbee Switch"
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0001", manufacturer:"_TZ3000_5ng23zjs", deviceJoinName: "Tuya Zigbee Switch"
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0001", manufacturer:"_TZ3000_rmjr4ufz", deviceJoinName: "Tuya Zigbee Switch"
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0001", manufacturer:"_TZ3000_v7gnj3ad", deviceJoinName: "Tuya Zigbee Switch"
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0001", manufacturer:"_TZ3000_mx3vgyea", deviceJoinName: "Tuya Zigbee Switch"
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0001", manufacturer:"_TZ3000_qsp2pwtf", deviceJoinName: "Tuya Zigbee Switch"
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS000F", manufacturer:"_TZ3000_m9af2l6g", deviceJoinName: "Tuya Zigbee Switch"
  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005 0006",           outClusters:"0019",      model:"TS0002", manufacturer:"Zemismart",        deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"_TZ3000_tas0zemd", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
@@ -54,8 +64,7 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"_TZ3000_atp7xmd9", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"   // check!
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"_TZ3000_h34ihclt", deviceJoinName: "Tuya Zigbee Switch Multi-Gang"      //// check!
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"_TYZB01_wmak4qjy", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  // check!
-        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006,E000,E001", outClusters:"0019,000A", model:"TS0004", manufacturer:"_TZ3000_qn8qvk9y", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
-        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001",      outClusters:"0019,000A", model:"TS0004", manufacturer:"_TZ3000_qn8qvk9y", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006,E000,E001", outClusters:"0019,000A", model:"TS0002", manufacturer:"_TZ3000_qn8qvk9y", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0003", manufacturer:"_TYZB01_pdevogdj", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0003", manufacturer:"_TZ3000_pdevogdj", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
@@ -106,6 +115,9 @@ metadata {
         command "powerOnState", [
             [name:"powerOnState",    type: "ENUM",   constraints: ["--- Select ---", "OFF", "ON", "Last state"], description: "Select Power On State"] 
         ]
+        command "switchType", [
+            [name:"switchType",    type: "ENUM",   constraints: ["--- Select ---", "toggle", "state", "momentary"], description: "Select Switch Type"]     // 0: 'toggle', 1: 'state', 2: 'momentary'
+        ]
         
         attribute "lastCheckin", "string"    
     }
@@ -140,7 +152,7 @@ def parse(String description) {
        // descMap.command =="0B" - command response
        def cd = getChildDevice("${device.id}-${descMap.endpoint}")
        if (cd == null) {
-           if (!(device.data.model  in ['TS0011'])) {
+           if (!(device.data.model  in ['TS0011', 'TS0001'])) {
                log.warn "${device.displayName} Child device ${device.id}-${descMap.endpoint} not found. Initialise parent device first"
                return
            }
@@ -175,6 +187,9 @@ def parse(String description) {
        }
     } // OnOff cluster, attrId "0000"
     else if (descMap.cluster == "0006" && descMap.attrId != "0000") { // other attr
+        processOnOfClusterOtherAttr( descMap )
+    }
+    else if (descMap.cluster == "E001") { // Tuya Switch Mode cluster
         processOnOfClusterOtherAttr( descMap )
     }
     else {
@@ -242,6 +257,7 @@ def setupChildDevices() {
             buttons = 2
             break
         case 'TS0011' :
+        case 'TS0001' :
             buttons = 0
             break
         default :
@@ -358,10 +374,35 @@ def powerOnState(relayMode) {
             log.error "${device.displayName} please select a Power On State option"
             return
     }
-    logDebug ("setting  Power On State option to: ${relayMode}")
+    logDebug ("setting  Power On State option to: ${relayMode}  (${modeEnum}")
     cmds += zigbee.writeAttribute(0x0006, 0x8002,  DataType.ENUM8, modeEnum)
     sendZigbeeCommands(cmds)
 }
+
+def switchType(type) {
+    List<String> cmds = []
+    int modeEnum = 99
+    switch(type) {
+        case "toggle" :
+            modeEnum = 0
+            break
+        case "state" :
+            modeEnum = 1
+            break
+        case "momentary" :
+            modeEnum = 2
+            break
+        default :
+            log.error "${device.displayName} please select a Switch Type"
+            return
+    }
+    logDebug ("setting  Switch Type to: ${type} (${modeEnum})")
+    cmds += zigbee.writeAttribute(0xE001, 0xD030,  DataType.ENUM8, modeEnum)
+    sendZigbeeCommands(cmds)
+}
+
+//            [name:"switchType",    type: "ENUM",   constraints: ["--- Select ---", "toggle", "state", "state"], description: "Select Switch Type"]     // 0: 'toggle', 1: 'state', 2: 'momentary'
+
 
 def processOnOfClusterOtherAttr( descMap ) {
     logDebug "cluster OnOff  attribute ${descMap.attrId} reported: value=${descMap.value}"
@@ -380,6 +421,10 @@ def processOnOfClusterOtherAttr( descMap ) {
         case "8002" :
             attrName = "Power On State"
             mode = value == 0 ? "off" : value == 1 ? "on" : value == 2 ?  "Last state" : null
+            break
+        case "D030" : // cluster E001
+            attrName = "Switch Type"
+            mode = value == 0 ? "toggle" : value == 1 ? "state" : value == 2 ?  "momentary state" : null
             break
         default :
             logDebug "processOnOfClusterOtherAttr: <b>UNPROCESSED On/Off Cluster</b>  attrId: ${descMap.attrId} value: ${descMap.value}"
