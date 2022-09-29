@@ -14,7 +14,7 @@
  *  Ver. 0.2.6 2022-06-03 kkossev - powerOnState and Debug logs improvements; importUrl; singleThreaded
  *  Ver. 0.2.7 2022-06-06 kkossev - command '0B' (command response) bug fix; added Tuya Zugbee mini switch TMZ02L (_TZ3000_txpirhfq); bug fix for TS0011 single-gang switches.
  *  Ver. 0.2.8 2022-07-13 kkossev - added _TZ3000_18ejxno0 and _TZ3000_qewo8dlz fingerprints; added TS0001 wall switches fingerprints; added TS011F 2-gang wall outlets; added switchType configuration
- *  Ver. 0.2.9 2022-09-29 kkossev - (dev branch) - added _TZ3000_hhiodade (ZTS-EU_1gang); added TS0001 _TZ3000_oex7egmt; _TZ3000_b9vanmes; _TZ3000_zmy4lslw
+ *  Ver. 0.2.9 2022-09-29 kkossev - added _TZ3000_hhiodade (ZTS-EU_1gang); added TS0001 _TZ3000_oex7egmt; _TZ3000_b9vanmes; _TZ3000_zmy4lslw
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
