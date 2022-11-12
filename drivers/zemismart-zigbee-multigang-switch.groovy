@@ -18,7 +18,7 @@
  *  Ver. 0.2.10 2022-10-15 kkossev - _TZ3000_hhiodade fingerprint correction; added _TZ3000_ji4araar
  *  Ver. 0.2.11 2022-11-07 kkossev - added _TZ3000_tqlv4ug4
  *  Ver. 0.2.12 2022-11-11 kkossev - added _TZ3000_cfnprab5 (TS011F) Xenon 4-gang + 2 USB extension; _TYZB01_vkwryfdr (TS0115) UseeLink; _TZ3000_udtmrasg (TS0003)
- *  Ver. 0.2.13 2022-11-12 kkossev - tuyaBlackMagic() for Xenon similar to Tuya Metering Plug.
+ *  Ver. 0.2.13 2022-11-12 kkossev - tuyaBlackMagic() for Xenon similar to Tuya Metering Plug; _TZ3000_cfnprab5 fingeprint correction
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -35,7 +35,7 @@ import hubitat.device.Protocol
 import groovy.transform.Field
 
 def version() { "0.2.13" }
-def timeStamp() {"2022/11/12 10:54 PM"}
+def timeStamp() {"2022/11/12 11:10 PM"}
 
 @Field static final Boolean debug = false
 
@@ -128,7 +128,7 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0013", manufacturer:"_TZ3000_k44bsygw", deviceJoinName: "Zemismart Zigbee Switch No Neutral"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,0000",           outClusters:"0019,000A", model:"TS0013", manufacturer:"_TZ3000_qewo8dlz", deviceJoinName: "Tuya Zigbee Switch 3 Gang No Neutral"    // @dingyang.yee https://www.aliexpress.com/item/4000298926256.html https://github.com/Koenkk/zigbee2mqtt/issues/6138#issuecomment-774720939
         
-        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_tqlv4ug4", deviceJoinName: "Xenon 4-gang + 2 USB extension"    //https://community.hubitat.com/t/xenon-4-gang-2-usb-extension-unable-to-switch-off-individual-sockets/101384/14?u=kkossev
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_cfnprab5", deviceJoinName: "Xenon 4-gang + 2 USB extension"    //https://community.hubitat.com/t/xenon-4-gang-2-usb-extension-unable-to-switch-off-individual-sockets/101384/14?u=kkossev
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0115", manufacturer:"_TYZB01_vkwryfdr", deviceJoinName: "UseeLink Power Strip"              //https://community.hubitat.com/t/another-brick-in-the-wall-tuya-joins-the-zigbee-alliance/44152/28?u=kkossev
         
         command "powerOnState", [
