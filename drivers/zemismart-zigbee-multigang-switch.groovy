@@ -18,7 +18,7 @@
  *  Ver. 0.2.10 2022-10-15 kkossev - _TZ3000_hhiodade fingerprint correction; added _TZ3000_ji4araar
  *  Ver. 0.2.11 2022-11-07 kkossev - added _TZ3000_tqlv4ug4
  *  Ver. 0.2.12 2022-11-11 kkossev - added _TZ3000_cfnprab5 (TS011F) Xenon 4-gang + 2 USB extension; _TYZB01_vkwryfdr (TS0115) UseeLink; _TZ3000_udtmrasg (TS0003)
- *  Ver. 0.2.13 2022-11-12 kkossev - tuyaBlackMagic() for Xenon similar to Tuya Metering Plug; _TZ3000_cfnprab5 fingeprint correction
+ *  Ver. 0.2.13 2022-11-12 kkossev - tuyaBlackMagic() for Xenon similar to Tuya Metering Plug; _TZ3000_cfnprab5 fingeprint correction; added SiHAS and NodOn switches
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -35,7 +35,7 @@ import hubitat.device.Protocol
 import groovy.transform.Field
 
 def version() { "0.2.13" }
-def timeStamp() {"2022/11/12 11:10 PM"}
+def timeStamp() {"2022/11/12 12:39 PM"}
 
 @Field static final Boolean debug = false
 
@@ -130,6 +130,17 @@ metadata {
         
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_cfnprab5", deviceJoinName: "Xenon 4-gang + 2 USB extension"    //https://community.hubitat.com/t/xenon-4-gang-2-usb-extension-unable-to-switch-off-individual-sockets/101384/14?u=kkossev
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0115", manufacturer:"_TYZB01_vkwryfdr", deviceJoinName: "UseeLink Power Strip"              //https://community.hubitat.com/t/another-brick-in-the-wall-tuya-joins-the-zigbee-alliance/44152/28?u=kkossev
+        
+		// SiHAS Switch (2~6 Gang)
+		fingerprint profileId:"0104", endpointId:"01", inClusters: "0000,0003,0006,0019", outClusters: "0003,0004,0019", manufacturer: "ShinaSystem", model: "SBM300Z2", deviceJoinName: "SiHAS Switch 2-gang"
+		fingerprint profileId:"0104", endpointId:"01", inClusters: "0000,0003,0006,0019", outClusters: "0003,0004,0019", manufacturer: "ShinaSystem", model: "SBM300Z3", deviceJoinName: "SiHAS Switch 3-gang"
+		fingerprint profileId:"0104", endpointId:"01", inClusters: "0000,0003,0006,0019", outClusters: "0003,0004,0019", manufacturer: "ShinaSystem", model: "SBM300Z4", deviceJoinName: "SiHAS Switch 4-gang"
+		fingerprint profileId:"0104", endpointId:"01", inClusters: "0000,0003,0006,0019", outClusters: "0003,0004,0019", manufacturer: "ShinaSystem", model: "SBM300Z5", deviceJoinName: "SiHAS Switch 5-gang"
+		fingerprint profileId:"0104", endpointId:"01", inClusters: "0000,0003,0006,0019", outClusters: "0003,0004,0019", manufacturer: "ShinaSystem", model: "SBM300Z6", deviceJoinName: "SiHAS Switch 6-gang"
+		fingerprint profileId:"0104", endpointId:"01", inClusters: "0000,0003,0006,0019", outClusters: "0003,0004,0019", manufacturer: "ShinaSystem", model: "ISM300Z3", deviceJoinName: "SiHAS Switch 3-gang"        
+		// NodOn
+		fingerprint profileId:"0104", endpointId:"01", inClusters: "0000,0003,0004,0005,0006,0007,0008,1000,FC57", outClusters: "0003,0006,0019", manufacturer: "NodOn", model: "SIN-4-2-20", deviceJoinName: "NodOn Light 2 channels"    // https://nodon.pro/en/produits/zigbee-pro-on-off-lighting-relay-switch/
+		fingerprint profileId:"0104", endpointId:"01", inClusters: "0000,0003,0004,0005,0006,0007,0008,1000,FC57", outClusters: "0003,0006,0019", manufacturer: "NodOn", model: "SIN-4-2-20_PRO", deviceJoinName: "NodOn Light 2 channels"      
         
         command "powerOnState", [
             [name:"powerOnState",    type: "ENUM",   constraints: ["--- Select ---", "OFF", "ON", "Last state"], description: "Select Power On State"] 
@@ -263,20 +274,30 @@ def setupChildDevices() {
     deleteObsoleteChildren()    
     def buttons = 0
     switch (device.data.model) {
+        case 'SBM300Z6' :
+            buttons = 6
+            break
         case 'TS011F' :
         case 'TS0115' :
+        case 'SBM300Z5' :
             buttons = 5
             break
         case 'TS0004' :
         case 'TS0014' :
+        case 'SBM300Z4' :
             buttons = 4
             break
         case 'TS0003' :
         case 'TS0013' :
+        case 'SBM300Z3' :
+        case 'ISM300Z3' :
             buttons = 3
             break
         case 'TS0002' :
         case 'TS0012' :
+        case 'SBM300Z2' :
+        case 'SIN-4-2-20' :
+        case 'SIN-4-2-20_PRO' : 
             buttons = 2
             break
         case 'TS0011' :
