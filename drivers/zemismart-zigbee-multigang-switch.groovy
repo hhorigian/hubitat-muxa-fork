@@ -17,7 +17,8 @@
  *  Ver. 0.2.9 2022-09-29 kkossev - added _TZ3000_hhiodade (ZTS-EU_1gang); added TS0001 _TZ3000_oex7egmt; _TZ3000_b9vanmes; _TZ3000_zmy4lslw
  *  Ver. 0.2.10 2022-10-15 kkossev - _TZ3000_hhiodade fingerprint correction; added _TZ3000_ji4araar
  *  Ver. 0.2.11 2022-11-07 kkossev - added _TZ3000_tqlv4ug4
- *  Ver. 0.2.12 2022-11-11 kkossev - added _TZ3000_cfnprab5 (TS011F) Xenon 4-gang + 2 USB extension
+ *  Ver. 0.2.12 2022-11-11 kkossev - added _TZ3000_cfnprab5 (TS011F) Xenon 4-gang + 2 USB extension; _TYZB01_vkwryfdr (TS0115) UseeLink; _TZ3000_udtmrasg (TS0003)
+ *  Ver. 0.2.13 2022-11-12 kkossev - tuyaBlackMagic() for Xenon similar to Tuya Metering Plug.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -33,8 +34,8 @@ import hubitat.device.HubAction
 import hubitat.device.Protocol
 import groovy.transform.Field
 
-def version() { "0.2.12" }
-def timeStamp() {"2022/11/11 8:14 PM"}
+def version() { "0.2.13" }
+def timeStamp() {"2022/11/12 10:54 PM"}
 
 @Field static final Boolean debug = false
 
@@ -86,6 +87,7 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0004,0005,0006",                outClusters:"0019",      model:"TS0003", manufacturer:"_TZ3000_c0wbnbbf", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001",      outClusters:"0019,000A", model:"TS0003", manufacturer:"_TZ3000_tbfw3xj0", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0003", manufacturer:"_TZ3000_tqlv4ug4", deviceJoinName: "GIRIER Tuya ZigBee 3.0 Light Switch Module"
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"2101,0000",                          outClusters:"0021",      model:"TS0003", manufacturer:"_TZ3000_udtmrasg", deviceJoinName: "Tuya 3-gang Switch"  
 
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0004", manufacturer:"_TZ3000_ltt60asa", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  // check! 
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0004", manufacturer:"_TZ3000_excgg5kb", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  // check!
@@ -127,6 +129,7 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,0000",           outClusters:"0019,000A", model:"TS0013", manufacturer:"_TZ3000_qewo8dlz", deviceJoinName: "Tuya Zigbee Switch 3 Gang No Neutral"    // @dingyang.yee https://www.aliexpress.com/item/4000298926256.html https://github.com/Koenkk/zigbee2mqtt/issues/6138#issuecomment-774720939
         
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_tqlv4ug4", deviceJoinName: "Xenon 4-gang + 2 USB extension"    //https://community.hubitat.com/t/xenon-4-gang-2-usb-extension-unable-to-switch-off-individual-sockets/101384/14?u=kkossev
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0115", manufacturer:"_TYZB01_vkwryfdr", deviceJoinName: "UseeLink Power Strip"              //https://community.hubitat.com/t/another-brick-in-the-wall-tuya-joins-the-zigbee-alliance/44152/28?u=kkossev
         
         command "powerOnState", [
             [name:"powerOnState",    type: "ENUM",   constraints: ["--- Select ---", "OFF", "ON", "Last state"], description: "Select Power On State"] 
@@ -261,6 +264,7 @@ def setupChildDevices() {
     def buttons = 0
     switch (device.data.model) {
         case 'TS011F' :
+        case 'TS0115' :
             buttons = 5
             break
         case 'TS0004' :
@@ -352,7 +356,12 @@ def updated() {
 
 
 def tuyaBlackMagic() {
-    return zigbee.readAttribute(0x0000, [0x0004, 0x000, 0x0001, 0x0005, 0x0007, 0xfffe], [:], delay=200)
+    List<String> cmds = []
+    cmds += zigbee.readAttribute(0x0000, [0x0004, 0x000, 0x0001, 0x0005, 0x0007, 0xfffe], [:], delay=200)
+    cmds += zigbee.writeAttribute(0x0000, 0xffde, 0x20, 0x0d, [destEndpoint :0x01], delay=50) 
+    cmds += zigbee.writeAttribute(0x0000, 0xffde, 0x20, 0x0d, [destEndpoint :0x01], delay=50) 
+    cmds += zigbee.writeAttribute(0x0000, 0xffde, 0x20, 0x0d, [destEndpoint :0x01], delay=50) 
+    return cmds
 }
 
 def configure() {
