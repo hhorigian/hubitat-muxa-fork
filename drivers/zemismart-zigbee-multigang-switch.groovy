@@ -4,6 +4,8 @@
  *
  *  Based on Muxa's driver Version 0.2.0, last updated Feb 5, 2020 
  *
+ *  https://community.hubitat.com/t/zemismart-zigbee-1-2-3-4-gang-light-switches/21124/36?u=kkossev
+ *
  *  Ver. 0.0.1 2019-08-21 Muxa    - first version
  *  Ver. 0.1.0 2020-02-05 Muxa    - Driver name "Zemismart ZigBee Wall Switch Multi-Gang"
  *  Ver. 0.2.1 2022-02-26 kkossev - TuyaBlackMagic for TS0003 _TZ3000_vjhcenzo 
@@ -18,7 +20,8 @@
  *  Ver. 0.2.10 2022-10-15 kkossev - _TZ3000_hhiodade fingerprint correction; added _TZ3000_ji4araar
  *  Ver. 0.2.11 2022-11-07 kkossev - added _TZ3000_tqlv4ug4
  *  Ver. 0.2.12 2022-11-11 kkossev - added _TZ3000_cfnprab5 (TS011F) Xenon 4-gang + 2 USB extension; _TYZB01_vkwryfdr (TS0115) UseeLink; _TZ3000_udtmrasg (TS0003)
- *  Ver. 0.2.13 2022-11-12 kkossev - tuyaBlackMagic() for Xenon similar to Tuya Metering Plug; _TZ3000_cfnprab5 fingeprint correction; added SiHAS and NodOn switches
+ *  Ver. 0.2.13 2022-11-12 kkossev - tuyaBlackMagic() for Xenon similar to Tuya Metering Plug; _TZ3000_cfnprab5 fingerprint correction; added SiHAS and NodOn switches
+ *  Ver. 0.2.14 2022-11-21 kkossev - (dev. branch) 
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -34,8 +37,8 @@ import hubitat.device.HubAction
 import hubitat.device.Protocol
 import groovy.transform.Field
 
-def version() { "0.2.13" }
-def timeStamp() {"2022/11/12 12:39 PM"}
+def version() { "0.2.14" }
+def timeStamp() {"2022/11/21 7:47 PM"}
 
 @Field static final Boolean debug = false
 
@@ -154,6 +157,7 @@ metadata {
     preferences {
         input (name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true)
         input (name: "txtEnable", type: "bool", title: "Enable description text logging", defaultValue: true)
+        input (title: "IMPORTANT", description: "<b>In order to operate normally, please pair the device to HE after changing to this driver!</b>", type: "paragraph", element: "paragraph")        
     }
  
 }
@@ -364,6 +368,7 @@ void initializeVars(boolean fullInit = true) {
 def initialize() {
     logDebug "Initializing..."
     initializeVars(fullInit = true) 
+    configure()    // added 11/12/2022
     setupChildDevices()
 }
 
@@ -396,7 +401,7 @@ def configure() {
 }
 
 void sendZigbeeCommands(List<String> cmds) {
-    logDebug "sendZigbeeCommands received : ${cmds}"
+    logDebug "sendZigbeeCommands : ${cmds}"
 	sendHubCommand(new hubitat.device.HubMultiAction(cmds, hubitat.device.Protocol.ZIGBEE))
 }
 
