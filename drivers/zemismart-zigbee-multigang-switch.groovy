@@ -21,7 +21,7 @@
  *  Ver. 0.2.11 2022-11-07 kkossev - added _TZ3000_tqlv4ug4
  *  Ver. 0.2.12 2022-11-11 kkossev - added _TZ3000_cfnprab5 (TS011F) Xenon 4-gang + 2 USB extension; _TYZB01_vkwryfdr (TS0115) UseeLink; _TZ3000_udtmrasg (TS0003)
  *  Ver. 0.2.13 2022-11-12 kkossev - tuyaBlackMagic() for Xenon similar to Tuya Metering Plug; _TZ3000_cfnprab5 fingerprint correction; added SiHAS and NodOn switches
- *  Ver. 0.2.14 2022-11-21 kkossev - (dev. branch) 
+ *  Ver. 0.2.14 2022-11-22 kkossev - (dev. branch) added 'ledMOode' command
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -38,7 +38,7 @@ import hubitat.device.Protocol
 import groovy.transform.Field
 
 def version() { "0.2.14" }
-def timeStamp() {"2022/11/21 7:47 PM"}
+def timeStamp() {"2022/11/22 7:58 AM"}
 
 @Field static final Boolean debug = false
 
@@ -150,6 +150,9 @@ metadata {
         ]
         command "switchType", [
             [name:"switchType",    type: "ENUM",   constraints: ["--- Select ---", "toggle", "state", "momentary"], description: "Select Switch Type"]     // 0: 'toggle', 1: 'state', 2: 'momentary'
+        ]
+        command "ledMode", [
+            [name:"ledMode",    type: "ENUM",   constraints: ["--- Select ---", "Disabled", "Lit when On", "Lit when Off"], description: "Select LED Mode"] 
         ]
         
         attribute "lastCheckin", "string"    
@@ -455,7 +458,30 @@ def switchType(type) {
     sendZigbeeCommands(cmds)
 }
 
-//            [name:"switchType",    type: "ENUM",   constraints: ["--- Select ---", "toggle", "state", "state"], description: "Select Switch Type"]     // 0: 'toggle', 1: 'state', 2: 'momentary'
+//  mode = value == 0 ? "Disabled"  : value == 1 ? "Lit when On" : value == 2 ? "Lit when Off" : null
+// [name:"ledMode",    type: "ENUM",   constraints: ["--- Select ---", "Disabled", "Lit when On", "Lit when Off], description: "Select LED Mode"] 
+
+def ledMode(mode) {
+    List<String> cmds = []
+    int modeEnum = 99
+    switch(mode) {
+        case "Disabled" :
+            modeEnum = 0
+            break
+        case "Lit when On" :
+            modeEnum = 1
+            break
+        case "Lit when Off" :
+            modeEnum = 2
+            break
+        default :
+            log.error "${device.displayName} please select a LED mode option"
+            return
+    }
+    logDebug ("setting  LED mode option to: ${mode}  (${modeEnum})")
+    cmds += zigbee.writeAttribute(0x0006, 0x8001,  DataType.ENUM8, modeEnum)
+    sendZigbeeCommands(cmds)
+}
 
 
 def processOnOfClusterOtherAttr( descMap ) {
