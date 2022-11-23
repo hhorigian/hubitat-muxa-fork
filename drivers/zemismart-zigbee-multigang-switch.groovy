@@ -4,6 +4,8 @@
  *
  *  Based on Muxa's driver Version 0.2.0, last updated Feb 5, 2020 
  *
+ *  https://community.hubitat.com/t/zemismart-zigbee-1-2-3-4-gang-light-switches/21124/36?u=kkossev
+ *
  *  Ver. 0.0.1 2019-08-21 Muxa    - first version
  *  Ver. 0.1.0 2020-02-05 Muxa    - Driver name "Zemismart ZigBee Wall Switch Multi-Gang"
  *  Ver. 0.2.1 2022-02-26 kkossev - TuyaBlackMagic for TS0003 _TZ3000_vjhcenzo 
@@ -18,7 +20,8 @@
  *  Ver. 0.2.10 2022-10-15 kkossev - _TZ3000_hhiodade fingerprint correction; added _TZ3000_ji4araar
  *  Ver. 0.2.11 2022-11-07 kkossev - added _TZ3000_tqlv4ug4
  *  Ver. 0.2.12 2022-11-11 kkossev - added _TZ3000_cfnprab5 (TS011F) Xenon 4-gang + 2 USB extension; _TYZB01_vkwryfdr (TS0115) UseeLink; _TZ3000_udtmrasg (TS0003)
- *  Ver. 0.2.13 2022-11-12 kkossev - tuyaBlackMagic() for Xenon similar to Tuya Metering Plug; _TZ3000_cfnprab5 fingeprint correction; added SiHAS and NodOn switches
+ *  Ver. 0.2.13 2022-11-12 kkossev - tuyaBlackMagic() for Xenon similar to Tuya Metering Plug; _TZ3000_cfnprab5 fingerprint correction; added SiHAS and NodOn switches
+ *  Ver. 0.2.14 2022-11-23 kkossev - added 'ledMOode' command; fingerprints critical bug fix.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -34,8 +37,8 @@ import hubitat.device.HubAction
 import hubitat.device.Protocol
 import groovy.transform.Field
 
-def version() { "0.2.13" }
-def timeStamp() {"2022/11/12 12:39 PM"}
+def version() { "0.2.14" }
+def timeStamp() {"2022/11/23 8:00 AM"}
 
 @Field static final Boolean debug = false
 
@@ -60,12 +63,12 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0001", manufacturer:"_TZ3000_oex7egmt", deviceJoinName: "Tuya 1 gang Zigbee switch MYQ-KLS01L"    //https://expo.tuya.com/product/601097
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0001", manufacturer:"_TZ3000_tqlv4ug4", deviceJoinName: "GIRIER Tuya ZigBee 3.0 Light Switch Module"    //https://community.hubitat.com/t/girier-tuya-zigbee-3-0-light-switch-module-smart-diy-breaker-1-2-3-4-gang-supports-2-way-control/104546
  
-        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005 0006",           outClusters:"0019",      model:"TS0002", manufacturer:"Zemismart",        deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"Zemismart",        deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"_TZ3000_tas0zemd", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"_TYZB01_tas0zemd", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"_TZ3000_7hp93xpr", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0004,0005,0006",                     outClusters:"0019",      model:"TS0002", manufacturer:"_TZ3000_7hp93xpr", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
-        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0004,0005 0006",                outClusters:"0019,000A", model:"TS0002", manufacturer:"_TZ3000_vjhyd6ar", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0004,0005,0006",                outClusters:"0019,000A", model:"TS0002", manufacturer:"_TZ3000_vjhyd6ar", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"_TZ3000_tonrapsk", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"_TZ3000_bvrlqyj7", deviceJoinName: "Avatto Zigbee Switch Multi-Gang"    // check!
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"_TZ3000_atp7xmd9", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"   // check!
@@ -148,12 +151,16 @@ metadata {
         command "switchType", [
             [name:"switchType",    type: "ENUM",   constraints: ["--- Select ---", "toggle", "state", "momentary"], description: "Select Switch Type"]     // 0: 'toggle', 1: 'state', 2: 'momentary'
         ]
+        command "ledMode", [
+            [name:"ledMode",    type: "ENUM",   constraints: ["--- Select ---", "Disabled", "Lit when On", "Lit when Off"], description: "Select LED Mode"] 
+        ]
         
         attribute "lastCheckin", "string"    
     }
     preferences {
         input (name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true)
         input (name: "txtEnable", type: "bool", title: "Enable description text logging", defaultValue: true)
+        input (title: "IMPORTANT", description: "<b>In order to operate normally, please pair the device to HE after changing to this driver!</b>", type: "paragraph", element: "paragraph")        
     }
  
 }
@@ -364,6 +371,7 @@ void initializeVars(boolean fullInit = true) {
 def initialize() {
     logDebug "Initializing..."
     initializeVars(fullInit = true) 
+    configure()    // added 11/12/2022
     setupChildDevices()
 }
 
@@ -396,7 +404,7 @@ def configure() {
 }
 
 void sendZigbeeCommands(List<String> cmds) {
-    logDebug "sendZigbeeCommands received : ${cmds}"
+    logDebug "sendZigbeeCommands : ${cmds}"
 	sendHubCommand(new hubitat.device.HubMultiAction(cmds, hubitat.device.Protocol.ZIGBEE))
 }
 
@@ -450,7 +458,30 @@ def switchType(type) {
     sendZigbeeCommands(cmds)
 }
 
-//            [name:"switchType",    type: "ENUM",   constraints: ["--- Select ---", "toggle", "state", "state"], description: "Select Switch Type"]     // 0: 'toggle', 1: 'state', 2: 'momentary'
+//  mode = value == 0 ? "Disabled"  : value == 1 ? "Lit when On" : value == 2 ? "Lit when Off" : null
+// [name:"ledMode",    type: "ENUM",   constraints: ["--- Select ---", "Disabled", "Lit when On", "Lit when Off], description: "Select LED Mode"] 
+
+def ledMode(mode) {
+    List<String> cmds = []
+    int modeEnum = 99
+    switch(mode) {
+        case "Disabled" :
+            modeEnum = 0
+            break
+        case "Lit when On" :
+            modeEnum = 1
+            break
+        case "Lit when Off" :
+            modeEnum = 2
+            break
+        default :
+            log.error "${device.displayName} please select a LED mode option"
+            return
+    }
+    logDebug ("setting  LED mode option to: ${mode}  (${modeEnum})")
+    cmds += zigbee.writeAttribute(0x0006, 0x8001,  DataType.ENUM8, modeEnum)
+    sendZigbeeCommands(cmds)
+}
 
 
 def processOnOfClusterOtherAttr( descMap ) {
