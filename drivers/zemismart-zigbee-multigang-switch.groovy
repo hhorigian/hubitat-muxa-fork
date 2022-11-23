@@ -22,6 +22,7 @@
  *  Ver. 0.2.12 2022-11-11 kkossev - added _TZ3000_cfnprab5 (TS011F) Xenon 4-gang + 2 USB extension; _TYZB01_vkwryfdr (TS0115) UseeLink; _TZ3000_udtmrasg (TS0003)
  *  Ver. 0.2.13 2022-11-12 kkossev - tuyaBlackMagic() for Xenon similar to Tuya Metering Plug; _TZ3000_cfnprab5 fingerprint correction; added SiHAS and NodOn switches
  *  Ver. 0.2.14 2022-11-23 kkossev - added 'ledMOode' command; fingerprints critical bug fix.
+ *  Ver. 0.2.15 2022-11-23 kkossev - added added _TZ3000_zmy1waw6
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -38,7 +39,7 @@ import hubitat.device.Protocol
 import groovy.transform.Field
 
 def version() { "0.2.14" }
-def timeStamp() {"2022/11/23 8:00 AM"}
+def timeStamp() {"2022/11/23 6:47 PM"}
 
 @Field static final Boolean debug = false
 
@@ -132,6 +133,7 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,0000",           outClusters:"0019,000A", model:"TS0013", manufacturer:"_TZ3000_qewo8dlz", deviceJoinName: "Tuya Zigbee Switch 3 Gang No Neutral"    // @dingyang.yee https://www.aliexpress.com/item/4000298926256.html https://github.com/Koenkk/zigbee2mqtt/issues/6138#issuecomment-774720939
         
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_cfnprab5", deviceJoinName: "Xenon 4-gang + 2 USB extension"    //https://community.hubitat.com/t/xenon-4-gang-2-usb-extension-unable-to-switch-off-individual-sockets/101384/14?u=kkossev
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0004,0005,0006",                outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_zmy1waw6", deviceJoinName: "Moes 1 gang"                       // https://github.com/zigpy/zha-device-handlers/issues/1262
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0115", manufacturer:"_TYZB01_vkwryfdr", deviceJoinName: "UseeLink Power Strip"              //https://community.hubitat.com/t/another-brick-in-the-wall-tuya-joins-the-zigbee-alliance/44152/28?u=kkossev
         
 		// SiHAS Switch (2~6 Gang)
@@ -285,6 +287,13 @@ def setupChildDevices() {
             buttons = 6
             break
         case 'TS011F' :
+            if (device.data.manufacturer == '_TZ3000_zmy1waw6') {
+                buttons = 1
+                break
+            }
+            else {
+                // continue below
+            }
         case 'TS0115' :
         case 'SBM300Z5' :
             buttons = 5
