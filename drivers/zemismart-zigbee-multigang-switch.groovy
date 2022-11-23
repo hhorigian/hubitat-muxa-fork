@@ -21,7 +21,7 @@
  *  Ver. 0.2.11 2022-11-07 kkossev - added _TZ3000_tqlv4ug4
  *  Ver. 0.2.12 2022-11-11 kkossev - added _TZ3000_cfnprab5 (TS011F) Xenon 4-gang + 2 USB extension; _TYZB01_vkwryfdr (TS0115) UseeLink; _TZ3000_udtmrasg (TS0003)
  *  Ver. 0.2.13 2022-11-12 kkossev - tuyaBlackMagic() for Xenon similar to Tuya Metering Plug; _TZ3000_cfnprab5 fingerprint correction; added SiHAS and NodOn switches
- *  Ver. 0.2.14 2022-11-22 kkossev - (dev. branch) added 'ledMOode' command
+ *  Ver. 0.2.14 2022-11-23 kkossev - added 'ledMOode' command; fingerprints critical bug fix.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -38,7 +38,7 @@ import hubitat.device.Protocol
 import groovy.transform.Field
 
 def version() { "0.2.14" }
-def timeStamp() {"2022/11/22 7:58 AM"}
+def timeStamp() {"2022/11/23 8:00 AM"}
 
 @Field static final Boolean debug = false
 
@@ -63,12 +63,12 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0001", manufacturer:"_TZ3000_oex7egmt", deviceJoinName: "Tuya 1 gang Zigbee switch MYQ-KLS01L"    //https://expo.tuya.com/product/601097
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0001", manufacturer:"_TZ3000_tqlv4ug4", deviceJoinName: "GIRIER Tuya ZigBee 3.0 Light Switch Module"    //https://community.hubitat.com/t/girier-tuya-zigbee-3-0-light-switch-module-smart-diy-breaker-1-2-3-4-gang-supports-2-way-control/104546
  
-        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005 0006",           outClusters:"0019",      model:"TS0002", manufacturer:"Zemismart",        deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"Zemismart",        deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"_TZ3000_tas0zemd", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"_TYZB01_tas0zemd", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"_TZ3000_7hp93xpr", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0004,0005,0006",                     outClusters:"0019",      model:"TS0002", manufacturer:"_TZ3000_7hp93xpr", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
-        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0004,0005 0006",                outClusters:"0019,000A", model:"TS0002", manufacturer:"_TZ3000_vjhyd6ar", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0004,0005,0006",                outClusters:"0019,000A", model:"TS0002", manufacturer:"_TZ3000_vjhyd6ar", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"_TZ3000_tonrapsk", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"_TZ3000_bvrlqyj7", deviceJoinName: "Avatto Zigbee Switch Multi-Gang"    // check!
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"_TZ3000_atp7xmd9", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"   // check!
