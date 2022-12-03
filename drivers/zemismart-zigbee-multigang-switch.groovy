@@ -24,6 +24,8 @@
  *  Ver. 0.2.14 2022-11-23 kkossev - added 'ledMOode' command; fingerprints critical bug fix.
  *  Ver. 0.2.15 2022-11-23 kkossev - added added _TZ3000_zmy1waw6
  *
+ *  Ver. 0.3.0  2022-12-03 kkossev - (TEST branch) - aqaraMagic()
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
  *
@@ -38,8 +40,8 @@ import hubitat.device.HubAction
 import hubitat.device.Protocol
 import groovy.transform.Field
 
-def version() { "0.2.14" }
-def timeStamp() {"2022/11/23 6:47 PM"}
+def version() { "0.3.0" }
+def timeStamp() {"2022/12/03 8:20 AM"}
 
 @Field static final Boolean debug = false
 
@@ -133,6 +135,7 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,0000",           outClusters:"0019,000A", model:"TS0013", manufacturer:"_TZ3000_qewo8dlz", deviceJoinName: "Tuya Zigbee Switch 3 Gang No Neutral"    // @dingyang.yee https://www.aliexpress.com/item/4000298926256.html https://github.com/Koenkk/zigbee2mqtt/issues/6138#issuecomment-774720939
         
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_cfnprab5", deviceJoinName: "Xenon 4-gang + 2 USB extension"    //https://community.hubitat.com/t/xenon-4-gang-2-usb-extension-unable-to-switch-off-individual-sockets/101384/14?u=kkossev
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0006,0003,0004,0005,E001",      outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_cfnprab5", deviceJoinName: "Xenon 4-gang + 2 USB extension"    //https://community.hubitat.com/t/xenon-4-gang-2-usb-extension-unable-to-switch-off-individual-sockets/101384/14?u=kkossev
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0004,0005,0006",                outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_zmy1waw6", deviceJoinName: "Moes 1 gang"                       // https://github.com/zigpy/zha-device-handlers/issues/1262
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0115", manufacturer:"_TYZB01_vkwryfdr", deviceJoinName: "UseeLink Power Strip"              //https://community.hubitat.com/t/another-brick-in-the-wall-tuya-joins-the-zigbee-alliance/44152/28?u=kkossev
         
@@ -181,7 +184,7 @@ def parse(String description) {
        if (settings?.logEnable) log.warn "${device.displayName} exception caught while parsing description ${description} \r descMap:  ${descMap}"
        return null
    }    
-   logDebug "Parsed: $descMap"
+   logDebug "Parsed descMap: ${descMap}"
     
    Map map = null // [:]
         
@@ -230,6 +233,10 @@ def parse(String description) {
     }
     else if (descMap.cluster == "E001") { // Tuya Switch Mode cluster
         processOnOfClusterOtherAttr( descMap )
+    }
+    else if (descMap?.clusterId == "0013" &&  descMap?.profileId != null && descMap?.profileId == "0000" ) {
+        log.warn "leave!"
+        configure()
     }
     else {
         logDebug "${device.displayName} unprocessed EP: ${descMap.sourceEndpoint} cluster: ${descMap.clusterId} attrId: ${descMap.attrId}"
@@ -392,23 +399,97 @@ def updated() {
     logDebug "Parent updated"
 }
 
+def activeEndpointsRequest() {
+    List<String> cmds = []
+    cmds += ["he raw ${device.deviceNetworkId} 0 0 0x0005 {00 ${zigbee.swapOctets(device.deviceNetworkId)}} {0x0000}", "delay 50",] // ZDO(x0000) Active Endpoints Request (cluster 0x0005)
+    return cmds    
+}
+
+def simpleDescriptorRequest(String endpointId) {
+    List<String> cmds = []
+    endpointIdTemp = "01"
+    cmds = ["he raw ${device.deviceNetworkId} 0 0 0x0004 {00 ${zigbee.swapOctets(device.deviceNetworkId)} $endpointId} {0x0000}", "delay 50",]
+    return cmds    
+}
+
+
+def nodeDescriptorResponse() {
+    List<String> cmds = []
+  //cmds = ["he raw 0x${device.deviceNetworkId} 0 0 0x8002 {40 00 00 00 00 40 8f 5f 11 52 52 00 41 2c 52 00 00} {0x0000}", "delay 50",]
+    cmds = ["he raw 0x${device.deviceNetworkId} 0 0 0x8002 {40 00 00 00 00 40 8f 0a 11 52 52 00 41 2c 52 00 00} {0x0000}", "delay 50",]
+    // 0000                                                             00 40 8f 0a 11 52 52 00 41 2c 52 00 00
+
+    return cmds
+}
+
+def bindingTableRequest() {
+    List<String> cmds = []
+    cmds += ["he raw ${device.deviceNetworkId} 0 0 0x0033 {00 ${zigbee.swapOctets(device.deviceNetworkId)}} {0x0000}", "delay 50",]
+    return cmds    
+}
+
+
 
 def tuyaBlackMagic() {
     List<String> cmds = []
     cmds += zigbee.readAttribute(0x0000, [0x0004, 0x000, 0x0001, 0x0005, 0x0007, 0xfffe], [:], delay=200)
-    cmds += zigbee.writeAttribute(0x0000, 0xffde, 0x20, 0x0d, [destEndpoint :0x01], delay=50) 
-    cmds += zigbee.writeAttribute(0x0000, 0xffde, 0x20, 0x0d, [destEndpoint :0x01], delay=50) 
-    cmds += zigbee.writeAttribute(0x0000, 0xffde, 0x20, 0x0d, [destEndpoint :0x01], delay=50) 
+   // cmds += zigbee.writeAttribute(0x0000, 0xffde, 0x20, 0x0d, [destEndpoint :0x01], delay=50) 
+  //  cmds += zigbee.writeAttribute(0x0000, 0xffde, 0x20, 0x0d, [destEndpoint :0x01], delay=50) 
+  //  cmds += zigbee.writeAttribute(0x0000, 0xffde, 0x20, 0x0d, [destEndpoint :0x01], delay=50) 
     return cmds
 }
 
 def configure() {
     logDebug " configure().."
     List<String> cmds = []
-    cmds += tuyaBlackMagic()
-    //cmds += refresh()
-    cmds += zigbee.onOffConfig()
-    cmds += zigbee.onOffRefresh()
+    if (device.data.manufacturer in ["_TZ3000_cfnprab5", "_TZ3000_okaz9tjs"]) {
+        cmds += tuyaBlackMagic()
+        cmds += activeEndpointsRequest()    // 1
+        cmds += nodeDescriptorResponse()    // 2
+        cmds += simpleDescriptorRequest("01")    // 3
+        cmds += zigbee.readAttribute(0x0001, [0x0001, 0x0004, 0005], [destEndpoint :0x01], delay=50) 
+        
+        /*
+        cmds += simpleDescriptorRequest("02")
+        cmds += zigbee.readAttribute(0x0001, [0x0001, 0x0004, 0005], [destEndpoint :0x02], delay=50) 
+        cmds += simpleDescriptorRequest("03")
+        cmds += zigbee.readAttribute(0x0001, [0x0001, 0x0004, 0005], [destEndpoint :0x03], delay=50) 
+        cmds += simpleDescriptorRequest("04")
+        cmds += zigbee.readAttribute(0x0001, [0x0001, 0x0004, 0005], [destEndpoint :0x04], delay=50) 
+        cmds += simpleDescriptorRequest("05")
+        cmds += zigbee.readAttribute(0x0001, [0x0001, 0x0004, 0005], [destEndpoint :0x05], delay=50) 
+        */
+    
+        cmds += bindingTableRequest()
+cmds += nodeDescriptorResponse()    // 2
+        cmds += zigbee.readAttribute(0x0006, 0x0000, [destEndpoint :0x01], delay=50) 
+        /*
+        cmds += zigbee.readAttribute(0x0006, 0x0000, [destEndpoint :0x02], delay=50) 
+        cmds += zigbee.readAttribute(0x0006, 0x0000, [destEndpoint :0x03], delay=50) 
+        cmds += zigbee.readAttribute(0x0006, 0x0000, [destEndpoint :0x04], delay=50) 
+        cmds += zigbee.readAttribute(0x0006, 0x0000, [destEndpoint :0x05], delay=50) 
+        */
+cmds += nodeDescriptorResponse()    // 2        
+        cmds +=  "zdo bind 0x${device.deviceNetworkId} 0x01 0x01 0x0006 {${device.zigbeeId}} {}" 
+        cmds += "delay 50"
+        /*
+        cmds +=  "zdo bind 0x${device.deviceNetworkId} 0x02 0x01 0x0006 {${device.zigbeeId}} {}"
+        cmds += "delay 50"
+        cmds +=  "zdo bind 0x${device.deviceNetworkId} 0x03 0x01 0x0006 {${device.zigbeeId}} {}"
+        cmds += "delay 50"
+        cmds +=  "zdo bind 0x${device.deviceNetworkId} 0x04 0x01 0x0006 {${device.zigbeeId}} {}"
+        cmds += "delay 50"
+        cmds +=  "zdo bind 0x${device.deviceNetworkId} 0x05 0x01 0x0006 {${device.zigbeeId}} {}"
+        cmds += "delay 50"
+        */
+cmds += nodeDescriptorResponse()    // 2        
+    }
+    else {
+        cmds += tuyaBlackMagic()
+        cmds += refresh()
+        cmds += zigbee.onOffConfig()
+        cmds += zigbee.onOffRefresh()
+    }
     sendZigbeeCommands(cmds)
 }
 
