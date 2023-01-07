@@ -24,7 +24,7 @@
  *  Ver. 0.2.14 2022-11-23 kkossev - added 'ledMOode' command; fingerprints critical bug fix.
  *  Ver. 0.2.15 2022-11-23 kkossev - added added _TZ3000_zmy1waw6
  *
- *  Ver. 0.3.0  2023-01-07 kkossev - (dev. branch) 
+ *  Ver. 0.3.0  2023-01-07 kkossev - (dev. branch) noBindingButPolling() for _TZ3000_fvh3pjaz _TZ3000_9hpxg80k _TZ3000_wyhuocal
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -110,6 +110,7 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0011", manufacturer:"_TZ3000_hhiodade", deviceJoinName: "Moes ZTS-EU_1gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,0000",           outClusters:"0019,000A", model:"TS0011", manufacturer:"_TZ3000_hhiodade", deviceJoinName: "Moes ZTS-EU_1gang"  // https://community.hubitat.com/t/uk-moes-zigbee-1-2-3-or-4-gang-light-switch/89747/5?u=kkossev
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0011", manufacturer:"_TZ3000_ji4araar", deviceJoinName: "Tuya 1 gang switch"  
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,0000",           outClusters:"0019,000A", model:"TS0011", manufacturer:"_TZ3000_9hpxg80k", deviceJoinName: "Tuya 1 gang"      // https://github.com/zigpy/zha-device-handlers/issues/535
         
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0001,0007,0000,0003,0004,0005,0006,E000,E001,0002", outClusters:"0019,000A", model:"TS0012", manufacturer:"_TZ3000_k008kbls", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang" // check! 
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0012", manufacturer:"_TZ3000_uz5xzdgy", deviceJoinName: "Zemismart Zigbee Switch No Neutral"
@@ -169,9 +170,10 @@ metadata {
         input (name: "txtEnable", type: "bool", title: "Enable description text logging", defaultValue: true)
         input (title: "IMPORTANT", description: "<b>In order to operate normally, please pair the device to HE after changing to this driver!</b>", type: "paragraph", element: "paragraph")        
     }
- 
 }
 
+private boolean isHEProblematic() {device.getDataValue("manufacturer") in ["_TZ3000_okaz9tjs", "_TZ3000_r6buo8ba", "_TZ3000_cfnprab5", "SONOFF", "Woolley", "unknown"] }
+private boolean noBindingButPolling() {device.getDataValue("manufacturer") in ['_TZ3000_fvh3pjaz', '_TZ3000_9hpxg80k', '_TZ3000_wyhuocal']}    //0x4001 OnTime: value 0 //0x4002 OffWaitTime: value 0
 
 // Parse incoming device messages to generate events
 
@@ -416,9 +418,19 @@ def configure() {
         log.warn "this device ${device.data.manufacturer} is known to NOT work with HE!"
     }
     cmds += tuyaBlackMagic()
-    //cmds += refresh()
-    cmds += zigbee.onOffConfig()
-    cmds += zigbee.onOffRefresh()
+    if (noBindingButPolling()) {
+		//these  will send out device anounce message at ervery 2 mins as heart beat, setting 0x0099 to 1 will disable it.
+		cmds += zigbee.writeAttribute(zigbee.BASIC_CLUSTER, 0x0099, 0x20, 0x01, [mfgCode: 0x0000])
+        // Hack : Need to disable reporting for thoses devices, else It will enable a auto power off after 2mn.     // see https://github.com/dresden-elektronik/deconz-rest-plugin/issues/3693
+        // https://github.com/Mariano-Github/Edge-Drivers-Beta/blob/652bcfbcf7b8ab8a14557e097b740216760f2b02/zigbee-multi-switch-v4-childs/src/init.lua 
+        log.warn "disabling ${device.data.manufacturer} device announce message every 2 mins and skipping reporting configuiration!"
+        cmds += zigbee.onOffRefresh()
+    }
+    else {
+        //cmds += refresh()
+        cmds += zigbee.onOffConfig()
+        cmds += zigbee.onOffRefresh()
+    }        
     sendZigbeeCommands(cmds)
 }
 
