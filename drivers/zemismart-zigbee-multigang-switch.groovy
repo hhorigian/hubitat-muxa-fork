@@ -24,6 +24,8 @@
  *  Ver. 0.2.14 2022-11-23 kkossev - added 'ledMOode' command; fingerprints critical bug fix.
  *  Ver. 0.2.15 2022-11-23 kkossev - added added _TZ3000_zmy1waw6
  *
+ *  Ver. 0.3.0  2023-01-07 kkossev - (dev. branch) 
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
  *
@@ -38,8 +40,8 @@ import hubitat.device.HubAction
 import hubitat.device.Protocol
 import groovy.transform.Field
 
-def version() { "0.2.14" }
-def timeStamp() {"2022/11/23 6:47 PM"}
+def version() { "0.3.0" }
+def timeStamp() {"2023/01/07 9:43 PM"}
 
 @Field static final Boolean debug = false
 
@@ -132,7 +134,10 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0013", manufacturer:"_TZ3000_k44bsygw", deviceJoinName: "Zemismart Zigbee Switch No Neutral"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,0000",           outClusters:"0019,000A", model:"TS0013", manufacturer:"_TZ3000_qewo8dlz", deviceJoinName: "Tuya Zigbee Switch 3 Gang No Neutral"    // @dingyang.yee https://www.aliexpress.com/item/4000298926256.html https://github.com/Koenkk/zigbee2mqtt/issues/6138#issuecomment-774720939
         
+        /* these do NOT work with Hubitat !
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_cfnprab5", deviceJoinName: "Xenon 4-gang + 2 USB extension"    //https://community.hubitat.com/t/xenon-4-gang-2-usb-extension-unable-to-switch-off-individual-sockets/101384/14?u=kkossev
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0006,0003,0004,0005,E001",      outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_cfnprab5", deviceJoinName: "Xenon 4-gang + 2 USB extension"    //https://community.hubitat.com/t/xenon-4-gang-2-usb-extension-unable-to-switch-off-individual-sockets/101384/14?u=kkossev
+        */
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0004,0005,0006",                outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_zmy1waw6", deviceJoinName: "Moes 1 gang"                       // https://github.com/zigpy/zha-device-handlers/issues/1262
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0115", manufacturer:"_TYZB01_vkwryfdr", deviceJoinName: "UseeLink Power Strip"              //https://community.hubitat.com/t/another-brick-in-the-wall-tuya-joins-the-zigbee-alliance/44152/28?u=kkossev
         
@@ -181,7 +186,7 @@ def parse(String description) {
        if (settings?.logEnable) log.warn "${device.displayName} exception caught while parsing description ${description} \r descMap:  ${descMap}"
        return null
    }    
-   logDebug "Parsed: $descMap"
+   logDebug "Parsed descMap: ${descMap}"
     
    Map map = null // [:]
         
@@ -230,6 +235,12 @@ def parse(String description) {
     }
     else if (descMap.cluster == "E001") { // Tuya Switch Mode cluster
         processOnOfClusterOtherAttr( descMap )
+    }
+    else if (descMap?.clusterId == "0013" &&  descMap?.profileId != null && descMap?.profileId == "0000" ) {
+    /*
+        log.warn "leave!"
+        configure()
+        */
     }
     else {
         logDebug "${device.displayName} unprocessed EP: ${descMap.sourceEndpoint} cluster: ${descMap.clusterId} attrId: ${descMap.attrId}"
@@ -392,19 +403,18 @@ def updated() {
     logDebug "Parent updated"
 }
 
-
 def tuyaBlackMagic() {
     List<String> cmds = []
     cmds += zigbee.readAttribute(0x0000, [0x0004, 0x000, 0x0001, 0x0005, 0x0007, 0xfffe], [:], delay=200)
-    cmds += zigbee.writeAttribute(0x0000, 0xffde, 0x20, 0x0d, [destEndpoint :0x01], delay=50) 
-    cmds += zigbee.writeAttribute(0x0000, 0xffde, 0x20, 0x0d, [destEndpoint :0x01], delay=50) 
-    cmds += zigbee.writeAttribute(0x0000, 0xffde, 0x20, 0x0d, [destEndpoint :0x01], delay=50) 
     return cmds
 }
 
 def configure() {
     logDebug " configure().."
     List<String> cmds = []
+    if (device.data.manufacturer in ["_TZ3000_cfnprab5", "_TZ3000_okaz9tjs"]) {
+        log.warn "this device ${device.data.manufacturer} is known to NOT work with HE!"
+    }
     cmds += tuyaBlackMagic()
     //cmds += refresh()
     cmds += zigbee.onOffConfig()
