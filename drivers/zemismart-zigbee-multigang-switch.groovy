@@ -23,8 +23,7 @@
  *  Ver. 0.2.13 2022-11-12 kkossev - tuyaBlackMagic() for Xenon similar to Tuya Metering Plug; _TZ3000_cfnprab5 fingerprint correction; added SiHAS and NodOn switches
  *  Ver. 0.2.14 2022-11-23 kkossev - added 'ledMOode' command; fingerprints critical bug fix.
  *  Ver. 0.2.15 2022-11-23 kkossev - added added _TZ3000_zmy1waw6
- *
- *  Ver. 0.3.0  2023-01-07 kkossev - (dev. branch) noBindingButPolling() for _TZ3000_fvh3pjaz _TZ3000_9hpxg80k _TZ3000_wyhuocal
+ *  Ver. 0.3.0  2023-01-07 kkossev - noBindingButPolling() for _TZ3000_fvh3pjaz _TZ3000_9hpxg80k _TZ3000_wyhuocal
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -408,6 +407,7 @@ def updated() {
 def tuyaBlackMagic() {
     List<String> cmds = []
     cmds += zigbee.readAttribute(0x0000, [0x0004, 0x000, 0x0001, 0x0005, 0x0007, 0xfffe], [:], delay=200)
+    cmds += zigbee.writeAttribute(0x0000, 0xffde, 0x20, 0x0d, [destEndpoint :0x01], delay=50) 
     return cmds
 }
 
