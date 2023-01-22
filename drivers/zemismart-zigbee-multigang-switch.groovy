@@ -24,7 +24,7 @@
  *  Ver. 0.2.14 2022-11-23 kkossev - added 'ledMOode' command; fingerprints critical bug fix.
  *  Ver. 0.2.15 2022-11-23 kkossev - added added _TZ3000_zmy1waw6
  *  Ver. 0.3.0  2023-01-07 kkossev - noBindingButPolling() for _TZ3000_fvh3pjaz _TZ3000_9hpxg80k _TZ3000_wyhuocal
- *  Ver. 0.3.1  2023-01-22 kkossev - (dev.branch) restored TS0003 _TZ3000_vjhcenzo fingerprint; added _TZ3000_iwhuhzdo
+ *  Ver. 0.3.1  2023-01-22 kkossev - restored TS0003 _TZ3000_vjhcenzo fingerprint; added _TZ3000_iwhuhzdo
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
