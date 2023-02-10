@@ -26,7 +26,7 @@
  *  Ver. 0.3.0  2023-01-07 kkossev - noBindingButPolling() for _TZ3000_fvh3pjaz _TZ3000_9hpxg80k _TZ3000_wyhuocal
  *  Ver. 0.3.1  2023-01-22 kkossev - restored TS0003 _TZ3000_vjhcenzo fingerprint; added _TZ3000_iwhuhzdo
  *  Ver. 0.4.0  2023-01-22 kkossev - parsing multiple attributes; 
- *  Ver. 0.4.1  2023-02-10 kkossev - IntelliJ lint; 
+ *  Ver. 0.4.1  2023-02-10 kkossev - IntelliJ lint; added _TZ3000_18ejxno0 third fingerprint; 
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -44,7 +44,7 @@ import groovy.transform.Field
 
 def version() { "0.4.1" }
 
-def timeStamp() { "2023/02/10 10:32 PM" }
+def timeStamp() { "2023/02/10 10:43 PM" }
 
 @Field static final Boolean debug = false
 
@@ -57,8 +57,7 @@ metadata {
         capability "Switch"
         capability "Health Check"
 
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0001", manufacturer: "_TZ3000_npzfdcof", deviceJoinName: "Tuya Zigbee Switch"
-        // https://www.aliexpress.com/item/1005002852788275.html
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0001", manufacturer: "_TZ3000_npzfdcof", deviceJoinName: "Tuya Zigbee Switch"            // https://www.aliexpress.com/item/1005002852788275.html
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0001", manufacturer: "_TZ3000_hktqahrq", deviceJoinName: "Tuya Zigbee Switch"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0001", manufacturer: "_TZ3000_mx3vgyea", deviceJoinName: "Tuya Zigbee Switch"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0001", manufacturer: "_TZ3000_5ng23zjs", deviceJoinName: "Tuya Zigbee Switch"
@@ -67,11 +66,8 @@ metadata {
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0001", manufacturer: "_TZ3000_mx3vgyea", deviceJoinName: "Tuya Zigbee Switch"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0001", manufacturer: "_TZ3000_qsp2pwtf", deviceJoinName: "Tuya Zigbee Switch"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS000F", manufacturer: "_TZ3000_m9af2l6g", deviceJoinName: "Tuya Zigbee Switch"
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0001", manufacturer: "_TZ3000_oex7egmt", deviceJoinName: "Tuya 1 gang Zigbee switch MYQ-KLS01L"
-        //https://expo.tuya.com/product/601097
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0001", manufacturer: "_TZ3000_tqlv4ug4", deviceJoinName: "GIRIER Tuya ZigBee 3.0 Light Switch Module"
-        //https://community.hubitat.com/t/girier-tuya-zigbee-3-0-light-switch-module-smart-diy-breaker-1-2-3-4-gang-supports-2-way-control/104546
-
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0001", manufacturer: "_TZ3000_oex7egmt", deviceJoinName: "Tuya 1 gang Zigbee switch MYQ-KLS01L"        //https://expo.tuya.com/product/601097
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0001", manufacturer: "_TZ3000_tqlv4ug4", deviceJoinName: "GIRIER Tuya ZigBee 3.0 Light Switch Module"  //https://community.hubitat.com/t/girier-tuya-zigbee-3-0-light-switch-module-smart-diy-breaker-1-2-3-4-gang-supports-2-way-control/104546
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0002", manufacturer: "Zemismart", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,000A,0004,0005,0006", outClusters: "0019", model: "TS0002", manufacturer: "_TZ3000_tas0zemd", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,000A,0004,0005,0006", outClusters: "0019", model: "TS0002", manufacturer: "_TYZB01_tas0zemd", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
@@ -79,19 +75,14 @@ metadata {
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0004,0005,0006", outClusters: "0019", model: "TS0002", manufacturer: "_TZ3000_7hp93xpr", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0004,0005,0006", outClusters: "0019,000A", model: "TS0002", manufacturer: "_TZ3000_vjhyd6ar", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0002", manufacturer: "_TZ3000_tonrapsk", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0002", manufacturer: "_TZ3000_bvrlqyj7", deviceJoinName: "Avatto Zigbee Switch Multi-Gang"
-        // check!
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0002", manufacturer: "_TZ3000_atp7xmd9", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
-        // check!
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0002", manufacturer: "_TZ3000_h34ihclt", deviceJoinName: "Tuya Zigbee Switch Multi-Gang"
-        //// check!
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0002", manufacturer: "_TYZB01_wmak4qjy", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
-        // check!
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0002", manufacturer: "_TZ3000_bvrlqyj7", deviceJoinName: "Avatto Zigbee Switch Multi-Gang"            // check!
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0002", manufacturer: "_TZ3000_atp7xmd9", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"         // check!
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0002", manufacturer: "_TZ3000_h34ihclt", deviceJoinName: "Tuya Zigbee Switch Multi-Gang"              // check!
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0002", manufacturer: "_TYZB01_wmak4qjy", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"         // check!
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006,E000,E001", outClusters: "0019,000A", model: "TS0002", manufacturer: "_TZ3000_qn8qvk9y", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0002", manufacturer: "_TZ3000_b9vanmes", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0002", manufacturer: "_TZ3000_tqlv4ug4", deviceJoinName: "GIRIER Tuya ZigBee 3.0 Light Switch Module"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,0702,0B04,E000,E001,0000", outClusters: "0019,000A", model: "TS0002", manufacturer: "_TZ3000_zmy4lslw", deviceJoinName: "Tuya Zigbee Switch Multi-Gang"
-
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,000A,0004,0005,0006", outClusters: "0019", model: "TS0003", manufacturer: "_TYZB01_pdevogdj", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,000A,0004,0005,0006", outClusters: "0019", model: "TS0003", manufacturer: "_TZ3000_pdevogdj", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0003", manufacturer: "_TZ3000_odzoiovu", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
@@ -106,75 +97,46 @@ metadata {
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0003", manufacturer: "_TZ3000_vjhcenzo", deviceJoinName: "Tuya 3-gang Switch"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "2101,0000", outClusters: "0021", model: "TS0003", manufacturer: "_TZ3000_udtmrasg", deviceJoinName: "Tuya 3-gang Switch"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0003", manufacturer: "_TZ3000_iwhuhzdo", deviceJoinName: "Zemismart ZL-LU03"
-
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0004", manufacturer: "_TZ3000_ltt60asa", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
-        // check!
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0004", manufacturer: "_TZ3000_excgg5kb", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
-        // check!
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0004", manufacturer: "_TZ3000_a37eix1s", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
-        // check!
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0004", manufacturer: "_TZ3000_ltt60asa", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"        // check!
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0004", manufacturer: "_TZ3000_excgg5kb", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"        // check!
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0004", manufacturer: "_TZ3000_a37eix1s", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"        // check!
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,000A,0004,0005,0006", outClusters: "0019", model: "TS0004", manufacturer: "_TZ3000_go9rahj5", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001", outClusters: "0019", model: "TS0004", manufacturer: "_TZ3000_aqgofyol", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
-
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0004", manufacturer: "_TZ3000_excgg5kb"
-        // 4-relays module
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0004", manufacturer: "_TZ3000_w58g68s3"
-        // Yagusmart 3 gang zigbee switch
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0004", manufacturer: "_TZ3000_excgg5kb"        // 4-relays module
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0004", manufacturer: "_TZ3000_w58g68s3"        // Yagusmart 3 gang zigbee switch
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0004", manufacturer: "_TZ3000_tqlv4ug4", deviceJoinName: "GIRIER Tuya ZigBee 3.0 Light Switch Module"
-
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0011", manufacturer: "_TZ3000_ybaprszv", deviceJoinName: "Zemismart Zigbee Switch No Neutral"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0011", manufacturer: "_TZ3000_txpirhfq", deviceJoinName: "Tuya Zigbee Mini Switch TMZ02L"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0011", manufacturer: "_TZ3000_hhiodade", deviceJoinName: "Moes ZTS-EU_1gang"
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,0000", outClusters: "0019,000A", model: "TS0011", manufacturer: "_TZ3000_hhiodade", deviceJoinName: "Moes ZTS-EU_1gang"
-        // https://community.hubitat.com/t/uk-moes-zigbee-1-2-3-or-4-gang-light-switch/89747/5?u=kkossev
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,0000", outClusters: "0019,000A", model: "TS0011", manufacturer: "_TZ3000_hhiodade", deviceJoinName: "Moes ZTS-EU_1gang"                    // https://community.hubitat.com/t/uk-moes-zigbee-1-2-3-or-4-gang-light-switch/89747/5?u=kkossev
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0011", manufacturer: "_TZ3000_ji4araar", deviceJoinName: "Tuya 1 gang switch"
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,0000", outClusters: "0019,000A", model: "TS0011", manufacturer: "_TZ3000_9hpxg80k", deviceJoinName: "Tuya 1 gang"
-        // https://github.com/zigpy/zha-device-handlers/issues/535
-
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0001,0007,0000,0003,0004,0005,0006,E000,E001,0002", outClusters: "0019,000A", model: "TS0012", manufacturer: "_TZ3000_k008kbls", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
-        // check!
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,0000", outClusters: "0019,000A", model: "TS0011", manufacturer: "_TZ3000_9hpxg80k", deviceJoinName: "Tuya 1 gang"                          // https://github.com/zigpy/zha-device-handlers/issues/535
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0001,0007,0000,0003,0004,0005,0006,E000,E001,0002", outClusters: "0019,000A", model: "TS0012", manufacturer: "_TZ3000_k008kbls", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"        // check!
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0012", manufacturer: "_TZ3000_uz5xzdgy", deviceJoinName: "Zemismart Zigbee Switch No Neutral"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0004,0005,0006", outClusters: "0019,000A", model: "TS0012", manufacturer: "_TZ3000_fvh3pjaz", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0004,0005,0006,EF00", outClusters: "0019,000A", model: "TS0012", manufacturer: "_TZ3000_lupfd8zu", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001", outClusters: "0019,000A", model: "TS0012", manufacturer: "_TZ3000_jl7qyupf", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,0000", outClusters: "0019,000A", model: "TS0012", manufacturer: "_TZ3000_18ejxno0", deviceJoinName: "Tuya Zigbee Switch Multi-Gang"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006,E000,E001", outClusters: "0019,000A", model: "TS0012", manufacturer: "_TZ3000_18ejxno0", deviceJoinName: "Tuya Zigbee Switch Multi-Gang"
-        // @dingyang.yee
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0012", manufacturer: "_TZ3000_18ejxno0", deviceJoinName: "Tuya Zigbee Switch Multi-Gang"
-        // check! ^^^^
-
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006", outClusters: "0019", model: "TS0013", manufacturer: "_TYZB01_Lrjzz1UV", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
-        // check!
-
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006", outClusters: "0019", model: "TS0013", manufacturer: "_TZ3000_bvrlqyj7", deviceJoinName: "Avatto Zigbee Switch Multi-Gang"
-        // check!
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006", outClusters: "0019", model: "TS0013", manufacturer: "_TZ3000_wu0shw0i", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
-        // check!
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006", outClusters: "0019", model: "TS0013", manufacturer: "_TYZB01_stv9a4gy", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
-        // check!
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006", outClusters: "0019", model: "TS0013", manufacturer: "_TYZB01_Lrjzz1UV", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"                // check!
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006", outClusters: "0019", model: "TS0013", manufacturer: "_TZ3000_bvrlqyj7", deviceJoinName: "Avatto Zigbee Switch Multi-Gang"                   // check!
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006", outClusters: "0019", model: "TS0013", manufacturer: "_TZ3000_wu0shw0i", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"                // check!
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006", outClusters: "0019", model: "TS0013", manufacturer: "_TYZB01_stv9a4gy", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"                // check!
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0004,0005,0006", outClusters: "0019,000A", model: "TS0013", manufacturer: "_TZ3000_wyhuocal", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0004,0005,0006", outClusters: "0019", model: "TS0013", manufacturer: "_TYZB01_mqel1whf", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
-
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006", outClusters: "0019", model: "TS0013", manufacturer: "_TZ3000_fvh3pjaz", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
-        // check!
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006", outClusters: "0019", model: "TS0013", manufacturer: "_TYZB01_mtlhqn48", deviceJoinName: "Lonsonho Zigbee Switch Multi-Gang"
-        // check!
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006", outClusters: "0019", model: "TS0013", manufacturer: "TUYATEC-O6SNCwd6", deviceJoinName: "TUYATEC Zigbee Switch Multi-Gang"
-        // check!
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006", outClusters: "0019", model: "TS0013", manufacturer: "_TZ3000_h34ihclt", deviceJoinName: "Tuya Zigbee Switch Multi-Gang"
-        // check!
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006", outClusters: "0019", model: "TS0013", manufacturer: "_TZ3000_fvh3pjaz", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"                // check!
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006", outClusters: "0019", model: "TS0013", manufacturer: "_TYZB01_mtlhqn48", deviceJoinName: "Lonsonho Zigbee Switch Multi-Gang"                 // check!
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006", outClusters: "0019", model: "TS0013", manufacturer: "TUYATEC-O6SNCwd6", deviceJoinName: "TUYATEC Zigbee Switch Multi-Gang"                  // check!
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006", outClusters: "0019", model: "TS0013", manufacturer: "_TZ3000_h34ihclt", deviceJoinName: "Tuya Zigbee Switch Multi-Gang"                     // check!
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0013", manufacturer: "_TZ3000_k44bsygw", deviceJoinName: "Zemismart Zigbee Switch No Neutral"
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,0000", outClusters: "0019,000A", model: "TS0013", manufacturer: "_TZ3000_qewo8dlz", deviceJoinName: "Tuya Zigbee Switch 3 Gang No Neutral"
-        // @dingyang.yee https://www.aliexpress.com/item/4000298926256.html https://github.com/Koenkk/zigbee2mqtt/issues/6138#issuecomment-774720939
-
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,0000", outClusters: "0019,000A", model: "TS0013", manufacturer: "_TZ3000_qewo8dlz", deviceJoinName: "Tuya Zigbee Switch 3 Gang No Neutral"    // @dingyang.yee https://www.aliexpress.com/item/4000298926256.html https://github.com/Koenkk/zigbee2mqtt/issues/6138#issuecomment-774720939
         /* these do NOT work with Hubitat !
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_cfnprab5", deviceJoinName: "Xenon 4-gang + 2 USB extension"    //https://community.hubitat.com/t/xenon-4-gang-2-usb-extension-unable-to-switch-off-individual-sockets/101384/14?u=kkossev
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0006,0003,0004,0005,E001",      outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_cfnprab5", deviceJoinName: "Xenon 4-gang + 2 USB extension"    //https://community.hubitat.com/t/xenon-4-gang-2-usb-extension-unable-to-switch-off-individual-sockets/101384/14?u=kkossev
         */
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0004,0005,0006", outClusters: "0019,000A", model: "TS011F", manufacturer: "_TZ3000_zmy1waw6", deviceJoinName: "Moes 1 gang"
-        // https://github.com/zigpy/zha-device-handlers/issues/1262
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,000A,0004,0005,0006", outClusters: "0019", model: "TS0115", manufacturer: "_TYZB01_vkwryfdr", deviceJoinName: "UseeLink Power Strip"
-        //https://community.hubitat.com/t/another-brick-in-the-wall-tuya-joins-the-zigbee-alliance/44152/28?u=kkossev
-
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0004,0005,0006", outClusters: "0019,000A", model: "TS011F", manufacturer: "_TZ3000_zmy1waw6", deviceJoinName: "Moes 1 gang"                            // https://github.com/zigpy/zha-device-handlers/issues/1262
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,000A,0004,0005,0006", outClusters: "0019", model: "TS0115", manufacturer: "_TYZB01_vkwryfdr", deviceJoinName: "UseeLink Power Strip"                   //https://community.hubitat.com/t/another-brick-in-the-wall-tuya-joins-the-zigbee-alliance/44152/28?u=kkossev
         // SiHAS Switch (2~6 Gang)
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006,0019", outClusters: "0003,0004,0019", manufacturer: "ShinaSystem", model: "SBM300Z2", deviceJoinName: "SiHAS Switch 2-gang"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006,0019", outClusters: "0003,0004,0019", manufacturer: "ShinaSystem", model: "SBM300Z3", deviceJoinName: "SiHAS Switch 3-gang"
