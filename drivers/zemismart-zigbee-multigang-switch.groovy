@@ -25,6 +25,7 @@
  *  Ver. 0.2.15 2022-11-23 kkossev - added added _TZ3000_zmy1waw6
  *  Ver. 0.3.0  2023-01-07 kkossev - noBindingButPolling() for _TZ3000_fvh3pjaz _TZ3000_9hpxg80k _TZ3000_wyhuocal
  *  Ver. 0.3.1  2023-01-22 kkossev - restored TS0003 _TZ3000_vjhcenzo fingerprint; added _TZ3000_iwhuhzdo
+ *  Ver. 0.4.0  2023-01-22 kkossev - parsing multiple attributes; 
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -40,8 +41,8 @@ import hubitat.device.HubAction
 import hubitat.device.Protocol
 import groovy.transform.Field
 
-def version() { "0.3.1" }
-def timeStamp() {"2023/01/22 5:12 PM"}
+def version() { "0.4.0" }
+def timeStamp() {"2023/01/22 11:58 PM"}
 
 @Field static final Boolean debug = false
 
@@ -65,7 +66,7 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS000F", manufacturer:"_TZ3000_m9af2l6g", deviceJoinName: "Tuya Zigbee Switch"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0001", manufacturer:"_TZ3000_oex7egmt", deviceJoinName: "Tuya 1 gang Zigbee switch MYQ-KLS01L"    //https://expo.tuya.com/product/601097
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0001", manufacturer:"_TZ3000_tqlv4ug4", deviceJoinName: "GIRIER Tuya ZigBee 3.0 Light Switch Module"    //https://community.hubitat.com/t/girier-tuya-zigbee-3-0-light-switch-module-smart-diy-breaker-1-2-3-4-gang-supports-2-way-control/104546
- 
+       
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"Zemismart",        deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"_TZ3000_tas0zemd", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0002", manufacturer:"_TYZB01_tas0zemd", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
@@ -81,7 +82,7 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0002", manufacturer:"_TZ3000_b9vanmes", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0002", manufacturer:"_TZ3000_tqlv4ug4", deviceJoinName: "GIRIER Tuya ZigBee 3.0 Light Switch Module"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,0702,0B04,E000,E001,0000", outClusters:"0019,000A", model:"TS0002", manufacturer:"_TZ3000_zmy4lslw", deviceJoinName: "Tuya Zigbee Switch Multi-Gang"
-        
+
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0003", manufacturer:"_TYZB01_pdevogdj", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0003", manufacturer:"_TZ3000_pdevogdj", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0003", manufacturer:"_TZ3000_odzoiovu", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  
@@ -96,24 +97,24 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0003", manufacturer:"_TZ3000_vjhcenzo", deviceJoinName: "Tuya 3-gang Switch"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"2101,0000",                          outClusters:"0021",      model:"TS0003", manufacturer:"_TZ3000_udtmrasg", deviceJoinName: "Tuya 3-gang Switch"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0003", manufacturer:"_TZ3000_iwhuhzdo", deviceJoinName: "Zemismart ZL-LU03"
-        
+
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0004", manufacturer:"_TZ3000_ltt60asa", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  // check! 
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0004", manufacturer:"_TZ3000_excgg5kb", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  // check!
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0004", manufacturer:"_TZ3000_a37eix1s", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  // check!
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0004", manufacturer:"_TZ3000_go9rahj5", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001",      outClusters:"0019",      model:"TS0004", manufacturer:"_TZ3000_aqgofyol", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
-        
+
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0004", manufacturer:"_TZ3000_excgg5kb"  // 4-relays module
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0004", manufacturer:"_TZ3000_w58g68s3"  // Yagusmart 3 gang zigbee switch
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0004", manufacturer:"_TZ3000_tqlv4ug4", deviceJoinName: "GIRIER Tuya ZigBee 3.0 Light Switch Module"
-        
+
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0011", manufacturer:"_TZ3000_ybaprszv", deviceJoinName: "Zemismart Zigbee Switch No Neutral"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0011", manufacturer:"_TZ3000_txpirhfq", deviceJoinName: "Tuya Zigbee Mini Switch TMZ02L"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0011", manufacturer:"_TZ3000_hhiodade", deviceJoinName: "Moes ZTS-EU_1gang"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,0000",           outClusters:"0019,000A", model:"TS0011", manufacturer:"_TZ3000_hhiodade", deviceJoinName: "Moes ZTS-EU_1gang"  // https://community.hubitat.com/t/uk-moes-zigbee-1-2-3-or-4-gang-light-switch/89747/5?u=kkossev
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0011", manufacturer:"_TZ3000_ji4araar", deviceJoinName: "Tuya 1 gang switch"  
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,0000",           outClusters:"0019,000A", model:"TS0011", manufacturer:"_TZ3000_9hpxg80k", deviceJoinName: "Tuya 1 gang"      // https://github.com/zigpy/zha-device-handlers/issues/535
-        
+
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0001,0007,0000,0003,0004,0005,0006,E000,E001,0002", outClusters:"0019,000A", model:"TS0012", manufacturer:"_TZ3000_k008kbls", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang" // check! 
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0012", manufacturer:"_TZ3000_uz5xzdgy", deviceJoinName: "Zemismart Zigbee Switch No Neutral"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0004,0005,0006",                outClusters:"0019,000A", model:"TS0012", manufacturer:"_TZ3000_fvh3pjaz", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
@@ -121,29 +122,29 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001",      outClusters:"0019,000A", model:"TS0012", manufacturer:"_TZ3000_jl7qyupf", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006,E000,E001", outClusters:"0019,000A", model:"TS0012", manufacturer:"_TZ3000_18ejxno0", deviceJoinName: "Tuya Zigbee Switch Multi-Gang"     // @dingyang.yee
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS0012", manufacturer:"_TZ3000_18ejxno0", deviceJoinName: "Tuya Zigbee Switch Multi-Gang"     // check! ^^^^
-        
+
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0006",                     outClusters:"0019",      model:"TS0013", manufacturer:"_TYZB01_Lrjzz1UV", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"  // check!
-        
+
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0006",                     outClusters:"0019",      model:"TS0013", manufacturer:"_TZ3000_bvrlqyj7", deviceJoinName: "Avatto Zigbee Switch Multi-Gang"  // check!
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0006",                     outClusters:"0019",      model:"TS0013", manufacturer:"_TZ3000_wu0shw0i", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang" // check! 
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0006",                     outClusters:"0019",      model:"TS0013", manufacturer:"_TYZB01_stv9a4gy", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang" // check! 
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0004,0005,0006",                outClusters:"0019,000A", model:"TS0013", manufacturer:"_TZ3000_wyhuocal", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0004,0005,0006",                outClusters:"0019",      model:"TS0013", manufacturer:"_TYZB01_mqel1whf", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
-        
+
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0006",                     outClusters:"0019",      model:"TS0013", manufacturer:"_TZ3000_fvh3pjaz", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang" // check! 
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0006",                     outClusters:"0019",      model:"TS0013", manufacturer:"_TYZB01_mtlhqn48", deviceJoinName: "Lonsonho Zigbee Switch Multi-Gang" // check!
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0006",                     outClusters:"0019",      model:"TS0013", manufacturer:"TUYATEC-O6SNCwd6", deviceJoinName: "TUYATEC Zigbee Switch Multi-Gang" // check! 
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0006",                     outClusters:"0019",      model:"TS0013", manufacturer:"_TZ3000_h34ihclt", deviceJoinName: "Tuya Zigbee Switch Multi-Gang"  // check!
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006",           outClusters:"0019",      model:"TS0013", manufacturer:"_TZ3000_k44bsygw", deviceJoinName: "Zemismart Zigbee Switch No Neutral"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,0000",           outClusters:"0019,000A", model:"TS0013", manufacturer:"_TZ3000_qewo8dlz", deviceJoinName: "Tuya Zigbee Switch 3 Gang No Neutral"    // @dingyang.yee https://www.aliexpress.com/item/4000298926256.html https://github.com/Koenkk/zigbee2mqtt/issues/6138#issuecomment-774720939
-        
+
         /* these do NOT work with Hubitat !
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_cfnprab5", deviceJoinName: "Xenon 4-gang + 2 USB extension"    //https://community.hubitat.com/t/xenon-4-gang-2-usb-extension-unable-to-switch-off-individual-sockets/101384/14?u=kkossev
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0006,0003,0004,0005,E001",      outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_cfnprab5", deviceJoinName: "Xenon 4-gang + 2 USB extension"    //https://community.hubitat.com/t/xenon-4-gang-2-usb-extension-unable-to-switch-off-individual-sockets/101384/14?u=kkossev
         */
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0004,0005,0006",                outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_zmy1waw6", deviceJoinName: "Moes 1 gang"                       // https://github.com/zigpy/zha-device-handlers/issues/1262
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,000A,0004,0005,0006",           outClusters:"0019",      model:"TS0115", manufacturer:"_TYZB01_vkwryfdr", deviceJoinName: "UseeLink Power Strip"              //https://community.hubitat.com/t/another-brick-in-the-wall-tuya-joins-the-zigbee-alliance/44152/28?u=kkossev
-        
+
 		// SiHAS Switch (2~6 Gang)
 		fingerprint profileId:"0104", endpointId:"01", inClusters: "0000,0003,0006,0019", outClusters: "0003,0004,0019", manufacturer: "ShinaSystem", model: "SBM300Z2", deviceJoinName: "SiHAS Switch 2-gang"
 		fingerprint profileId:"0104", endpointId:"01", inClusters: "0000,0003,0006,0019", outClusters: "0003,0004,0019", manufacturer: "ShinaSystem", model: "SBM300Z3", deviceJoinName: "SiHAS Switch 3-gang"
@@ -154,7 +155,7 @@ metadata {
 		// NodOn
 		fingerprint profileId:"0104", endpointId:"01", inClusters: "0000,0003,0004,0005,0006,0007,0008,1000,FC57", outClusters: "0003,0006,0019", manufacturer: "NodOn", model: "SIN-4-2-20", deviceJoinName: "NodOn Light 2 channels"    // https://nodon.pro/en/produits/zigbee-pro-on-off-lighting-relay-switch/
 		fingerprint profileId:"0104", endpointId:"01", inClusters: "0000,0003,0004,0005,0006,0007,0008,1000,FC57", outClusters: "0003,0006,0019", manufacturer: "NodOn", model: "SIN-4-2-20_PRO", deviceJoinName: "NodOn Light 2 channels"      
-        
+
         command "powerOnState", [
             [name:"powerOnState",    type: "ENUM",   constraints: ["--- Select ---", "OFF", "ON", "Last state"], description: "Select Power On State"] 
         ]
@@ -164,7 +165,10 @@ metadata {
         command "ledMode", [
             [name:"ledMode",    type: "ENUM",   constraints: ["--- Select ---", "Disabled", "Lit when On", "Lit when Off"], description: "Select LED Mode"] 
         ]
-        
+        if (debug == true) {
+            command "test", ["string"]
+        }
+
         attribute "lastCheckin", "string"    
     }
     preferences {
@@ -180,21 +184,157 @@ private boolean noBindingButPolling() {device.getDataValue("manufacturer") in ['
 // Parse incoming device messages to generate events
 
 def parse(String description) {
-   checkDriverVersion()
-   //log.debug "${device.displayName} Parsing '${description}'"
-   def descMap = [:] 
-   try {
-       descMap = zigbee.parseDescriptionAsMap(description)
-   }
-   catch ( e ) {
-       if (settings?.logEnable) log.warn "${device.displayName} exception caught while parsing description ${description} \r descMap:  ${descMap}"
-       return null
-   }    
-   logDebug "Parsed descMap: ${descMap}"
+    checkDriverVersion()
+    //log.debug "${device.displayName} Parsing '${description}'"
+    def descMap = [:] 
+    try {
+        descMap = zigbee.parseDescriptionAsMap(description)
+    }
+    catch ( e ) {
+        if (settings?.logEnable) log.warn "${device.displayName} exception caught while parsing description ${description} \r descMap:  ${descMap}"
+        return null
+    }    
+    logDebug "Parsed descMap: ${descMap} (description:${description})"
     
-   Map map = null // [:]
-        
-   if (descMap.cluster == "0006" && descMap.attrId == "0000") {
+    Map map = null // [:]
+
+    if (descMap.attrId != null ) {
+        //log.trace "parsing descMap.attrId ${descMap.attrId}"
+        parseAttributes(descMap)
+        return
+    }
+    /*
+    else if (descMap.cluster == "0006" && descMap.attrId == "0000") {
+       processOnOff( descMap )
+    } // OnOff cluster, attrId "0000"
+    else if (descMap.cluster == "0006" && descMap.attrId != "0000") { // other attr
+        processOnOfClusterOtherAttr( descMap )
+    }
+    else if (descMap.cluster == "E001") { // Tuya Switch Mode cluster
+        processOnOfClusterOtherAttr( descMap )
+    }
+    */
+    else if (descMap?.clusterId == "0013" &&  descMap?.profileId != null && descMap?.profileId == "0000" ) {
+        logInfo "device model ${device.data.model}, manufacturer ${device.data.manufacturer} <b>re-joined the network</b> (deviceNetworkId ${device.properties.deviceNetworkId}, zigbeeId ${device.properties.zigbeeId})"
+    }
+    else {
+        logDebug "${device.displayName} unprocessed EP: ${descMap.sourceEndpoint} cluster: ${descMap.clusterId} attrId: ${descMap.attrId}"
+    }
+}
+
+def parseAttributes( Map descMap ) {
+    // attribute report received
+    List attrData = [[cluster: descMap.cluster, attrId: descMap.attrId, value: descMap.value, status: descMap.status]]
+    descMap.additionalAttrs.each {
+        attrData << [cluster: descMap.cluster, attrId: it.attrId, value: it.value, status: it.status]
+    }
+    //log.trace "attrData 2 = ${attrData} "
+    attrData.each {
+        parseSingleAttribute( it, descMap )
+    } // for each attribute    
+}
+
+private void parseSingleAttribute( Map it, Map descMap ) {
+    //log.trace "parseSingleAttribute :${it}"
+    if (it.status == "86") {
+        log.warn "${device.displayName} Read attribute response: unsupported Attributte ${it.attrId} cluster ${descMap.cluster}"
+        return
+    }
+    switch (it.cluster) {
+        case "0000" :
+            parseBasicClusterAttribute( it )
+            break
+        case "0006" :
+            //log.warn "case cluster 0006"
+            switch (it.attrId) {
+                case "0000" :
+                    //log.warn "case cluster 0006 attrId 0000"
+                    processOnOff( it, descMap )
+                    break
+                default :
+                    //log.warn "case cluster 0006 attrId ${it.attrId}"
+                    processOnOfClusterOtherAttr( it )
+                    break
+            }
+            break
+        case "0008" :
+            if (logEnable) log.warn "${device.displayName} may be a dimmer? This is not the right driver...cluster:${cluster} attrId ${it.attrId} value:${it.value}"
+            break
+        case "0300" :
+            if (logEnable) log.warn "${device.displayName} may be a bulb? This is not the right driver...cluster:${cluster} attrId ${it.attrId} value:${it.value}"
+            break
+        case "0702" :
+        case "0B04" :
+            if (logEnable) log.warn "${device.displayName} may be a power monitoring socket? This is not the right driver...cluster:${cluster} attrId ${it.attrId} value:${it.value}"
+            break
+        case "E000" :
+        case "E001" :
+            processOnOfClusterOtherAttr( it )
+            break
+        case "EF00" : // Tuya cluster
+            log.warn "${device.displayName} NOT PROCESSED Tuya Cluster EF00 attribute ${it.attrId}\n descMap = ${descMap}"
+            break
+        case "FFFD" : // TuyaClusterRevision
+           if (logEnable) log.warn "${device.displayName}  Tuya Cluster Revision cluster:${cluster} attrId ${it.attrId} value:${it.value}"
+           break
+        case "FFFE" : // AttributeReportingStatus
+           if (logEnable) log.warn "${device.displayName}  Tuya Attribute Reporting Status cluster:${cluster} attrId ${it.attrId} value:${it.value}"
+           break
+        default :
+            if (logEnable) {
+                String respType = (command == "0A") ? "reportResponse" : "readAttributeResponse"
+                log.warn "${device.displayName} parseAttributes: <b>NOT PROCESSED</b>: <b>cluster ${descMap.cluster}</b> attribite:${it.attrId}, value:${it.value}, encoding:${it.encoding}, respType:${respType}"  
+            }
+            break
+        } // it.cluster
+}
+
+def parseBasicClusterAttribute( Map it ) {
+    // https://github.com/zigbeefordomoticz/Domoticz-Zigbee/blob/6df64ab4656b65ec1a450bd063f71a350c18c92e/Modules/readClusters.py 
+                switch (it.attrId) {
+                    case "0000" :
+                        logDebug "ZLC version: ${it.value}"        // default 0x03
+                        break
+                    case "0001" :
+                        logDebug "Applicaiton version: ${it.value}"    // For example, 0b 01 00 0001 = 1.0.1, where 0x41 is 1.0.1
+                        break                                                            // https://developer.tuya.com/en/docs/iot-device-dev/tuya-zigbee-lighting-dimmer-swith-access-standard?id=K9ik6zvlvbqyw 
+                    case "0002" : 
+                        logDebug "Stack version: ${it.value}"        // default 0x02
+                        break
+                    case "0003" : 
+                        logDebug "HW version: ${it.value}"        // default 0x01
+                        break
+                    case "0004" :
+                        logDebug "Manufacturer name: ${it.value}"
+                        break
+                    case "0005" :
+                        logDebug "Model Identifier: ${it.value}"
+                        break
+                    case "0007" :
+                        logDebug "Power Source: ${it.value}"        // enum8-0x30 default 0x03
+                        break
+                    case "4000" :    //software build
+                        logDebug "softwareBuild: ${it.value}"
+                        //updateDataValue("$LAB softwareBuild",it.value ?: "unknown")
+                        break
+                    case "FFE2" :
+                    case "FFE4" :
+                        logDebug "Attribite ${it.attrId} : ${it.value}"
+                        break
+                    case "FFFD" :    // Cluster Revision (Tuya specific)
+                        logDebug "Cluster Revision 0xFFFD: ${it.value}"    //uint16 -0x21 default 0x0001
+                        break
+                    case "FFFE" :    // Tuya specific
+                        logDebug "Tuya specific 0xFFFE: ${it.value}"
+                        break
+                    default :
+                        if (logEnable) log.warn "${device.displayName} parseBasicClusterAttribute cluster:${cluster} UNKNOWN  attrId ${it.attrId} value:${it.value}"
+                }
+}
+
+
+
+def processOnOff( it, descMap ) {
        // descMap.command =="0A" - switch toggled physically
        // descMap.command =="01" - get switch status
        // descMap.command =="0B" - command response
@@ -218,7 +358,8 @@ def parse(String description) {
        }
        if (switchAttribute == "on") {
            logDebug "Parent switch on"
-           return createEvent(name: "switch", value: "on")
+           sendEvent(name: "switch", value: "on")
+           return
        } 
        else if (switchAttribute == "off") {
             def cdsOn = 0
@@ -230,25 +371,10 @@ def parse(String description) {
             }
             if (cdsOn == 0) {
                 logDebug "Parent switch off"
-                return createEvent(name: "switch", value: "off")
+                sendEvent(name: "switch", value: "off")
+                return
             }
        }
-    } // OnOff cluster, attrId "0000"
-    else if (descMap.cluster == "0006" && descMap.attrId != "0000") { // other attr
-        processOnOfClusterOtherAttr( descMap )
-    }
-    else if (descMap.cluster == "E001") { // Tuya Switch Mode cluster
-        processOnOfClusterOtherAttr( descMap )
-    }
-    else if (descMap?.clusterId == "0013" &&  descMap?.profileId != null && descMap?.profileId == "0000" ) {
-    /*
-        log.warn "leave!"
-        configure()
-        */
-    }
-    else {
-        logDebug "${device.displayName} unprocessed EP: ${descMap.sourceEndpoint} cluster: ${descMap.clusterId} attrId: ${descMap.attrId}"
-    }
 }
 
 def off() {
@@ -376,7 +502,7 @@ def driverVersionAndTimeStamp() {version()+' '+timeStamp()}
 
 def checkDriverVersion() {
     if (state.driverVersion == null || (driverVersionAndTimeStamp() != state.driverVersion)) {
-        if (txtEnable==true) log.debug "${device.displayName} updating the settings from the current driver version ${state.driverVersion} to the new version ${driverVersionAndTimeStamp()}"
+        if (txtEnable==true) log.debug "${device.displayName} updating the settings from the current driver ${device.properties.typeName} version ${state.driverVersion} to the new version ${driverVersionAndTimeStamp()} [model ${device.data.model}, manufacturer ${device.data.manufacturer}, application ${device.data.application}, endpointId ${device.endpointId}]"
         initializeVars( fullInit = false ) 
         state.driverVersion = driverVersionAndTimeStamp()
     }
@@ -400,7 +526,8 @@ def initialize() {
 }
 
 def installed() {
-    logDebug "Parent installed"
+    logInfo "<b>Parent installed</b>, typeName ${device.properties.typeName}, version ${driverVersionAndTimeStamp()}, deviceNetworkId ${device.properties.deviceNetworkId}, zigbeeId ${device.properties.zigbeeId}"
+    logInfo "model ${device.data.model}, manufacturer ${device.data.manufacturer}, application ${device.data.application}, endpointId ${device.endpointId}"
 }
 
 def updated() {
@@ -409,7 +536,7 @@ def updated() {
 
 def tuyaBlackMagic() {
     List<String> cmds = []
-    cmds += zigbee.readAttribute(0x0000, [0x0004, 0x000, 0x0001, 0x0005, 0x0007, 0xfffe], [:], delay=200)
+    cmds += zigbee.readAttribute(0x0000, [0x0004, 0x0000, 0x0001, 0x0005, 0x0007, 0xfffe], [:], delay=200)
     cmds += zigbee.writeAttribute(0x0000, 0xffde, 0x20, 0x0d, [destEndpoint :0x01], delay=50) 
     return cmds
 }
@@ -444,8 +571,13 @@ void sendZigbeeCommands(List<String> cmds) {
 
 
 def logDebug(msg) {
-    String sDnMsg = device.displayName + " " + msg
+    String sDnMsg = device?.displayName + " " + msg
     if (settings?.logEnable) log.debug sDnMsg
+}
+
+def logInfo(msg) {
+    String sDnMsg = device?.displayName + " " + msg
+    if (settings?.txtEnable) log.info sDnMsg
 }
 
 def powerOnState(relayMode) {
@@ -518,31 +650,56 @@ def ledMode(mode) {
 }
 
 
-def processOnOfClusterOtherAttr( descMap ) {
-    logDebug "cluster OnOff  attribute ${descMap.attrId} reported: value=${descMap.value}"
+def processOnOfClusterOtherAttr( Map it ) {
+    //logDebug "processOnOfClusterOtherAttr attribute ${it.attrId} value=${it.value}"
     def mode
     def attrName
-    def value = descMap.value as int
-    switch (descMap.attrId) {
-        case "8000" :
+    def value
+    try {
+        value = it.value as int
+    }
+    catch (e) {
+        value = it.value
+    }
+    def clusterPlusAttr = it.cluster + "_" + it.attrId
+    //log.trace "clusterPlusAttr = ${clusterPlusAttr}"
+    switch (clusterPlusAttr) {
+        case "0006_4001" :
+        case "0006_4002" :
+            attrName = "attribute " + clusterPlusAttr
+            mode = value.toString()
+            break
+        case "0006_8000" :
             attrName = "Child Lock"
             mode = value == 0 ? "off" : "on"
             break
-        case "8001" :
+        case "0006_8001" :
             attrName = "LED mode"
             mode = value == 0 ? "Disabled"  : value == 1 ? "Lit when On" : value == 2 ? "Lit when Off" : null
             break
-        case "8002" :
+        case "0006_8002" :
             attrName = "Power On State"
             mode = value == 0 ? "off" : value == 1 ? "on" : value == 2 ?  "Last state" : null
             break
-        case "D030" : // cluster E001
+        case "E000_D001" :
+        case "E000_D002" :
+        case "E000_D003" :
+            attrName = "attribute " + clusterPlusAttr
+            mode = value.toString()
+            break
+        case "E001_D030" : 
             attrName = "Switch Type"
             mode = value == 0 ? "toggle" : value == 1 ? "state" : value == 2 ?  "momentary state" : null
             break
         default :
-            logDebug "processOnOfClusterOtherAttr: <b>UNPROCESSED On/Off Cluster</b>  attrId: ${descMap.attrId} value: ${descMap.value}"
-            break
+            logDebug "processOnOfClusterOtherAttr: <b>UNPROCESSED On/Off Cluster</b>  attrId: ${it.attrId} value: ${it.value}"
+            return
     }
-    if (txtEnable) log.info "${device.displayName} ${attrName} is: ${mode}"    
+    if (txtEnable) log.info "${device.displayName} ${attrName} is: ${mode} (${value})"    
 }
+
+def test( description ) {
+    log.warn "testing <b>${description}</b>"
+    parse(description)
+}
+
