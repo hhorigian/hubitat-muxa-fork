@@ -1,7 +1,16 @@
 drivers/zemismart-zigbee-multigang-switch.groovy.bak
+<<<<<<< HEAD
 hubitat-muxa-fork.iml
 .idea/.gitignore
 .idea/misc.xml
 .idea/modules.xml
 .idea/vcs.xml
 apps/apps.iml
+=======
+apps/apps.iml
+.idea/vcs.xml
+.idea/modules.xml
+.idea/misc.xml
+.idea/.gitignore
+hubitat-muxa-fork.iml
+>>>>>>> development
