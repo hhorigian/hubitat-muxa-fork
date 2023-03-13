@@ -27,6 +27,7 @@
  *  Ver. 0.3.1  2023-01-22 kkossev - restored TS0003 _TZ3000_vjhcenzo fingerprint; added _TZ3000_iwhuhzdo
  *  Ver. 0.4.0  2023-01-22 kkossev - parsing multiple attributes; 
  *  Ver. 0.4.1  2023-02-10 kkossev - IntelliJ lint; added _TZ3000_18ejxno0 third fingerprint; 
+ *  Ver. 0.5.0  2023-03-13 kkossev - removed the Initialize capability and replaced it with a custom command
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -42,15 +43,15 @@ import hubitat.device.HubAction
 import hubitat.device.Protocol
 import groovy.transform.Field
 
-def version() { "0.4.1" }
+def version() { "0.5.0" }
 
-def timeStamp() { "2023/02/10 10:43 PM" }
+def timeStamp() { "2023/04/13 11:50 PM" }
 
 @Field static final Boolean debug = false
 
 metadata {
     definition(name: "Zemismart ZigBee Wall Switch Multi-Gang", namespace: "muxa", author: "Muxa", importUrl: "https://raw.githubusercontent.com/kkossev/hubitat-muxa-fork/development/drivers/zemismart-zigbee-multigang-switch.groovy", singleThreaded: true) {
-        capability "Initialize"
+        //capability "Initialize" removed 2023-03-14
         capability "Actuator"
         capability "Configuration"
         capability "Refresh"
@@ -158,6 +159,7 @@ metadata {
         command "ledMode", [
                 [name: "ledMode", type: "ENUM", constraints: ["--- Select ---", "Disabled", "Lit when On", "Lit when Off"], description: "Select LED Mode"]
         ]
+        command "initialize", [[name: "Select 'Yes' to re-initialize the device", type: "ENUM", description: "re-creates the child devices!", constraints: ["--- Select ---", "Yes", "No"]]]
         if (debug == true) {
             command "test", ["string"]
         }
@@ -511,6 +513,14 @@ void initializeVars(boolean fullInit = true) {
     if (settings?.txtEnable == null) device.updateSetting("txtEnable", true)
 }
 
+def initialize( str ) {
+    if (str == "Yes") {
+        initialize() 
+    }
+    else {
+        logInfo "initialize aborted!"
+    }
+}
 def initialize() {
     logDebug "Initializing..."
     initializeVars(fullInit = true)
