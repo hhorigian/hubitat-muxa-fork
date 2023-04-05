@@ -28,6 +28,7 @@
  *  Ver. 0.4.0  2023-01-22 kkossev - parsing multiple attributes; 
  *  Ver. 0.4.1  2023-02-10 kkossev - IntelliJ lint; added _TZ3000_18ejxno0 third fingerprint; 
  *  Ver. 0.5.0  2023-03-13 kkossev - removed the Initialize capability and replaced it with a custom command
+ *  Ver. 0.5.1  2023-04-05 kkossev - added _TZ3000_pfc7i3kt
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -43,9 +44,9 @@ import hubitat.device.HubAction
 import hubitat.device.Protocol
 import groovy.transform.Field
 
-def version() { "0.5.0" }
+def version() { "0.5.1" }
 
-def timeStamp() { "2023/04/13 11:50 PM" }
+def timeStamp() { "2023/04/05 7:27 AM" }
 
 @Field static final Boolean debug = false
 
@@ -98,6 +99,7 @@ metadata {
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0003", manufacturer: "_TZ3000_vjhcenzo", deviceJoinName: "Tuya 3-gang Switch"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "2101,0000", outClusters: "0021", model: "TS0003", manufacturer: "_TZ3000_udtmrasg", deviceJoinName: "Tuya 3-gang Switch"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0003", manufacturer: "_TZ3000_iwhuhzdo", deviceJoinName: "Zemismart ZL-LU03"
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,0702,0B04,E000,E001,0000", outClusters: "0019,000A", model: "TS0003", manufacturer: "_TZ3000_pfc7i3kt", deviceJoinName: "MOES Tuya Zigebee Module"    // https://community.hubitat.com/t/driver-needed-for-moes-3-gang-smart-switch-module-ms-104cz/116449?u=kkossev
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0004", manufacturer: "_TZ3000_ltt60asa", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"        // check!
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0004", manufacturer: "_TZ3000_excgg5kb", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"        // check!
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0004", manufacturer: "_TZ3000_a37eix1s", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"        // check!
