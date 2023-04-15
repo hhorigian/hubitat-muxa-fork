@@ -36,7 +36,7 @@
  *  Ver. 0.4.0  2023-01-22 kkossev - parsing multiple attributes; 
  *  Ver. 0.4.1  2023-02-10 kkossev - IntelliJ lint; added _TZ3000_18ejxno0 third fingerprint; 
  *  Ver. 0.5.0  2023-03-13 kkossev - removed the Initialize capability and replaced it with a custom command
- *  Ver. 0.5.1  2023-04-14 kkossev - (dev. branch) added _TZ3000_pfc7i3kt; added TS011F _TZ3000_18ejxno0 (2 gang);
+ *  Ver. 0.5.1  2023-04-15 kkossev - (dev. branch) bugfix: initialize() was not called when a new device is paired; added _TZ3000_pfc7i3kt; added TS011F _TZ3000_18ejxno0 (2 gangs); _TZ3000_zmy1waw6 bug fix; added TS011F _TZ3000_yf8iuzil (2 gangs)
  *
  */
 
@@ -46,7 +46,7 @@ import groovy.transform.Field
 
 def version() { "0.5.1" }
 
-def timeStamp() { "2023/04/14 10:38 PM" }
+def timeStamp() { "2023/04/15 9:16 AM" }
 
 @Field static final Boolean debug = false
 
@@ -140,6 +140,7 @@ metadata {
         */
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0004,0005,0006", outClusters: "0019,000A", model: "TS011F", manufacturer: "_TZ3000_zmy1waw6", deviceJoinName: "Moes 1 gang"                                // https://github.com/zigpy/zha-device-handlers/issues/1262
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,0702,0B04,E000,E001,0000", outClusters: "0019,000A", model: "TS011F", manufacturer: "_TZ3000_18ejxno0", deviceJoinName: "Moes 2 gang"       // https://pl.aliexpress.com/item/1005002061628356.html
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,0702,0B04,E000,E001,0000", outClusters: "0019,000A", model: "TS011F", manufacturer: "_TZ3000_yf8iuzil", deviceJoinName: "Moes 2 gang"       // https://community.hubitat.com/t/moes-zigbee-wall-touch-smart-light-switch/97870/36?u=kkossev
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,000A,0004,0005,0006", outClusters: "0019", model: "TS0115", manufacturer: "_TYZB01_vkwryfdr", deviceJoinName: "UseeLink Power Strip"                       //https://community.hubitat.com/t/another-brick-in-the-wall-tuya-joins-the-zigbee-alliance/44152/28?u=kkossev
         // SiHAS Switch (2~6 Gang)
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006,0019", outClusters: "0003,0004,0019", manufacturer: "ShinaSystem", model: "SBM300Z2", deviceJoinName: "SiHAS Switch 2-gang"
@@ -428,9 +429,9 @@ def setupChildDevices() {
             break
         case 'TS011F':
             if (device.data.manufacturer == '_TZ3000_zmy1waw6') {
-                buttons = 1
+                buttons = 0
             } 
-            else if (device.data.manufacturer == '_TZ3000_18ejxno0') {
+            else if (device.data.manufacturer in ['_TZ3000_18ejxno0', '_TZ3000_yf8iuzil']) {
                 buttons = 2
             } 
             else {
@@ -538,6 +539,7 @@ def initialize() {
 def installed() {
     logInfo "<b>Parent installed</b>, typeName ${device.properties.typeName}, version ${driverVersionAndTimeStamp()}, deviceNetworkId ${device.properties.deviceNetworkId}, zigbeeId ${device.properties.zigbeeId}"
     logInfo "model ${device.data.model}, manufacturer ${device.data.manufacturer}, application ${device.data.application}, endpointId ${device.endpointId}"
+    initialize()
 }
 
 def updated() {
