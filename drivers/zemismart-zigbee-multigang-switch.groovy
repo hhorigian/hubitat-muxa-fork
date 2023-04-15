@@ -37,8 +37,12 @@
  *  Ver. 0.4.1  2023-02-10 kkossev - IntelliJ lint; added _TZ3000_18ejxno0 third fingerprint; 
  *  Ver. 0.5.0  2023-03-13 kkossev - removed the Initialize capability and replaced it with a custom command
  *  Ver. 0.5.1  2023-04-15 kkossev - bugfix: initialize() was not called when a new device is paired; added _TZ3000_pfc7i3kt; added TS011F _TZ3000_18ejxno0 (2 gangs); _TZ3000_zmy1waw6 bug fix; added TS011F _TZ3000_yf8iuzil (2 gangs)
- *  Ver. 0.5.2  2023-04-15 kkossev - (dev. branch)added TS0002 _TZ3000_5gey1ohx
+ *  Ver. 0.5.2  2023-04-15 kkossev - (dev. branch)added TS0002 _TZ3000_5gey1ohx; unschedule all remaining jobs from previous drivers on initialize();
  *
+ *                                   TODO: automatic logsOff()
+ *                                   TODO: add healhCheck
+ *                                   TODO: add numberOfGangs setting
+ *                                   TODO: deviceProfiles
  */
 
 import hubitat.device.HubAction
@@ -47,7 +51,7 @@ import groovy.transform.Field
 
 def version() { "0.5.2" }
 
-def timeStamp() { "2023/04/15 9:35 AM" }
+def timeStamp() { "2023/04/15 10:37 AM" }
 
 @Field static final Boolean debug = false
 
@@ -469,7 +473,7 @@ def setupChildDevices() {
         default:
             break
     }
-    logDebug "model: ${device.data.model} buttons: $buttons"
+    logInfo "model: ${device.data.model} gangs:${buttons==0 ? 1 : buttons} child devices: ${buttons}"
     createChildDevices((int) buttons)
 }
 
@@ -516,6 +520,7 @@ def checkDriverVersion() {
 void initializeVars(boolean fullInit = true) {
     if (settings?.txtEnable) log.info "${device.displayName} InitializeVars()... fullInit = ${fullInit}"
     if (fullInit == true) {
+        unschedule()
         state.clear()
         state.driverVersion = driverVersionAndTimeStamp()
     }
