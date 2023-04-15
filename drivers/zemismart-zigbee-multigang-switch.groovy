@@ -1,10 +1,18 @@
 /**
- *  Zemismart ZigBee Wall Switch Multi-Gang
- *  Device Driver for Hubitat Elevation hub
- *
- *  Based on Muxa's driver Version 0.2.0, last updated Feb 5, 2020 
+ *  Zemismart ZigBee Wall Switch Multi-Gang - Device Driver for Hubitat Elevation hub
  *
  *  https://community.hubitat.com/t/zemismart-zigbee-1-2-3-4-gang-light-switches/21124/36?u=kkossev
+ *
+ *  Based on Muxa's driver Version 0.2.0 (last updated Feb 5, 2020)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License. You may obtain a copy of the License at:
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+ *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
+ *  for the specific language governing permissions and limitations under the License.
  *
  *  Ver. 0.0.1 2019-08-21 Muxa    - first version
  *  Ver. 0.1.0 2020-02-05 Muxa    - Driver name "Zemismart ZigBee Wall Switch Multi-Gang"
@@ -27,30 +35,24 @@
  *  Ver. 0.3.1  2023-01-22 kkossev - restored TS0003 _TZ3000_vjhcenzo fingerprint; added _TZ3000_iwhuhzdo
  *  Ver. 0.4.0  2023-01-22 kkossev - parsing multiple attributes; 
  *  Ver. 0.4.1  2023-02-10 kkossev - IntelliJ lint; added _TZ3000_18ejxno0 third fingerprint; 
+ *  Ver. 0.5.0  2023-03-13 kkossev - removed the Initialize capability and replaced it with a custom command
+ *  Ver. 0.5.1  2023-04-15 kkossev - bugfix: initialize() was not called when a new device is paired; added _TZ3000_pfc7i3kt; added TS011F _TZ3000_18ejxno0 (2 gangs); _TZ3000_zmy1waw6 bug fix; added TS011F _TZ3000_yf8iuzil (2 gangs)
  *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- *  in compliance with the License. You may obtain a copy of the License at:
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
- *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
- *  for the specific language governing permissions and limitations under the License.
  */
 
 import hubitat.device.HubAction
 import hubitat.device.Protocol
 import groovy.transform.Field
 
-def version() { "0.4.1" }
+def version() { "0.5.1" }
 
-def timeStamp() { "2023/02/10 10:43 PM" }
+def timeStamp() { "2023/04/15 9:16 AM" }
 
 @Field static final Boolean debug = false
 
 metadata {
     definition(name: "Zemismart ZigBee Wall Switch Multi-Gang", namespace: "muxa", author: "Muxa", importUrl: "https://raw.githubusercontent.com/kkossev/hubitat-muxa-fork/development/drivers/zemismart-zigbee-multigang-switch.groovy", singleThreaded: true) {
-        capability "Initialize"
+        //capability "Initialize" removed 2023-03-14
         capability "Actuator"
         capability "Configuration"
         capability "Refresh"
@@ -97,6 +99,7 @@ metadata {
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0003", manufacturer: "_TZ3000_vjhcenzo", deviceJoinName: "Tuya 3-gang Switch"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "2101,0000", outClusters: "0021", model: "TS0003", manufacturer: "_TZ3000_udtmrasg", deviceJoinName: "Tuya 3-gang Switch"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0003", manufacturer: "_TZ3000_iwhuhzdo", deviceJoinName: "Zemismart ZL-LU03"
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,0702,0B04,E000,E001,0000", outClusters: "0019,000A", model: "TS0003", manufacturer: "_TZ3000_pfc7i3kt", deviceJoinName: "MOES Tuya Zigebee Module"    // https://community.hubitat.com/t/driver-needed-for-moes-3-gang-smart-switch-module-ms-104cz/116449?u=kkossev
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0004", manufacturer: "_TZ3000_ltt60asa", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"        // check!
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0004", manufacturer: "_TZ3000_excgg5kb", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"        // check!
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0004", manufacturer: "_TZ3000_a37eix1s", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"        // check!
@@ -135,8 +138,10 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_cfnprab5", deviceJoinName: "Xenon 4-gang + 2 USB extension"    //https://community.hubitat.com/t/xenon-4-gang-2-usb-extension-unable-to-switch-off-individual-sockets/101384/14?u=kkossev
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0006,0003,0004,0005,E001",      outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_cfnprab5", deviceJoinName: "Xenon 4-gang + 2 USB extension"    //https://community.hubitat.com/t/xenon-4-gang-2-usb-extension-unable-to-switch-off-individual-sockets/101384/14?u=kkossev
         */
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0004,0005,0006", outClusters: "0019,000A", model: "TS011F", manufacturer: "_TZ3000_zmy1waw6", deviceJoinName: "Moes 1 gang"                            // https://github.com/zigpy/zha-device-handlers/issues/1262
-        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,000A,0004,0005,0006", outClusters: "0019", model: "TS0115", manufacturer: "_TYZB01_vkwryfdr", deviceJoinName: "UseeLink Power Strip"                   //https://community.hubitat.com/t/another-brick-in-the-wall-tuya-joins-the-zigbee-alliance/44152/28?u=kkossev
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0004,0005,0006", outClusters: "0019,000A", model: "TS011F", manufacturer: "_TZ3000_zmy1waw6", deviceJoinName: "Moes 1 gang"                                // https://github.com/zigpy/zha-device-handlers/issues/1262
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,0702,0B04,E000,E001,0000", outClusters: "0019,000A", model: "TS011F", manufacturer: "_TZ3000_18ejxno0", deviceJoinName: "Moes 2 gang"       // https://pl.aliexpress.com/item/1005002061628356.html
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,0702,0B04,E000,E001,0000", outClusters: "0019,000A", model: "TS011F", manufacturer: "_TZ3000_yf8iuzil", deviceJoinName: "Moes 2 gang"       // https://community.hubitat.com/t/moes-zigbee-wall-touch-smart-light-switch/97870/36?u=kkossev
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,000A,0004,0005,0006", outClusters: "0019", model: "TS0115", manufacturer: "_TYZB01_vkwryfdr", deviceJoinName: "UseeLink Power Strip"                       //https://community.hubitat.com/t/another-brick-in-the-wall-tuya-joins-the-zigbee-alliance/44152/28?u=kkossev
         // SiHAS Switch (2~6 Gang)
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006,0019", outClusters: "0003,0004,0019", manufacturer: "ShinaSystem", model: "SBM300Z2", deviceJoinName: "SiHAS Switch 2-gang"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006,0019", outClusters: "0003,0004,0019", manufacturer: "ShinaSystem", model: "SBM300Z3", deviceJoinName: "SiHAS Switch 3-gang"
@@ -158,6 +163,7 @@ metadata {
         command "ledMode", [
                 [name: "ledMode", type: "ENUM", constraints: ["--- Select ---", "Disabled", "Lit when On", "Lit when Off"], description: "Select LED Mode"]
         ]
+        command "initialize", [[name: "Select 'Yes' to re-initialize the device", type: "ENUM", description: "re-creates the child devices!", constraints: ["--- Select ---", "Yes", "No"]]]
         if (debug == true) {
             command "test", ["string"]
         }
@@ -423,11 +429,15 @@ def setupChildDevices() {
             break
         case 'TS011F':
             if (device.data.manufacturer == '_TZ3000_zmy1waw6') {
-                buttons = 1
-                break
-            } else {
-                // continue below
+                buttons = 0
+            } 
+            else if (device.data.manufacturer in ['_TZ3000_18ejxno0', '_TZ3000_yf8iuzil']) {
+                buttons = 2
+            } 
+            else {
+                buttons = 5
             }
+            break
         case 'TS0115':
         case 'SBM300Z5':
             buttons = 5
@@ -511,6 +521,14 @@ void initializeVars(boolean fullInit = true) {
     if (settings?.txtEnable == null) device.updateSetting("txtEnable", true)
 }
 
+def initialize( str ) {
+    if (str == "Yes") {
+        initialize() 
+    }
+    else {
+        logInfo "initialize aborted!"
+    }
+}
 def initialize() {
     logDebug "Initializing..."
     initializeVars(fullInit = true)
@@ -521,6 +539,7 @@ def initialize() {
 def installed() {
     logInfo "<b>Parent installed</b>, typeName ${device.properties.typeName}, version ${driverVersionAndTimeStamp()}, deviceNetworkId ${device.properties.deviceNetworkId}, zigbeeId ${device.properties.zigbeeId}"
     logInfo "model ${device.data.model}, manufacturer ${device.data.manufacturer}, application ${device.data.application}, endpointId ${device.endpointId}"
+    initialize()
 }
 
 def updated() {
