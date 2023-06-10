@@ -37,10 +37,11 @@
  *  Ver. 0.4.1  2023-02-10 kkossev - IntelliJ lint; added _TZ3000_18ejxno0 third fingerprint; 
  *  Ver. 0.5.0  2023-03-13 kkossev - removed the Initialize capability and replaced it with a custom command
  *  Ver. 0.5.1  2023-04-15 kkossev - bugfix: initialize() was not called when a new device is paired; added _TZ3000_pfc7i3kt; added TS011F _TZ3000_18ejxno0 (2 gangs); _TZ3000_zmy1waw6 bug fix; added TS011F _TZ3000_yf8iuzil (2 gangs)
- *  Ver. 0.5.2  2023-04-15 kkossev - (dev. branch)added TS0002 _TZ3000_5gey1ohx; unschedule all remaining jobs from previous drivers on initialize();
+ *  Ver. 0.5.2  2023-06-10 kkossev - added TS0002 _TZ3000_5gey1ohx; unschedule all remaining jobs from previous drivers on initialize(); added _TZ3000_zigisuyh
  *
+ *                                   TODO: check a possible problem w/ initialize() : https://community.hubitat.com/t/driver-needed-for-moes-3-gang-smart-switch-module-ms-104cz/116449/15?u=kkossev 
  *                                   TODO: automatic logsOff()
- *                                   TODO: add healhCheck
+ *                                   TODO: add healthCheck
  *                                   TODO: add numberOfGangs setting
  *                                   TODO: deviceProfiles
  */
@@ -51,7 +52,7 @@ import groovy.transform.Field
 
 def version() { "0.5.2" }
 
-def timeStamp() { "2023/04/15 10:37 AM" }
+def timeStamp() { "2023/06/10 5:58 PM" }
 
 @Field static final Boolean debug = false
 
@@ -147,6 +148,12 @@ metadata {
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0004,0005,0006", outClusters: "0019,000A", model: "TS011F", manufacturer: "_TZ3000_zmy1waw6", deviceJoinName: "Moes 1 gang"                                // https://github.com/zigpy/zha-device-handlers/issues/1262
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,0702,0B04,E000,E001,0000", outClusters: "0019,000A", model: "TS011F", manufacturer: "_TZ3000_18ejxno0", deviceJoinName: "Moes 2 gang"       // https://pl.aliexpress.com/item/1005002061628356.html
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,0702,0B04,E000,E001,0000", outClusters: "0019,000A", model: "TS011F", manufacturer: "_TZ3000_yf8iuzil", deviceJoinName: "Moes 2 gang"       // https://community.hubitat.com/t/moes-zigbee-wall-touch-smart-light-switch/97870/36?u=kkossev
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_v1pdxuqq", deviceJoinName: "XH-002P Outlet TS011F No Power Monitoring"  // - no power monitoring !
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_hyfvrar3", deviceJoinName: "TS011F No Power Monitoring"  // - no power monitoring !
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_cymsnfvf", deviceJoinName: "TS011F No Power Monitoring"  // - no power monitoring !
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_bfn1w0mm", deviceJoinName: "TS011F No Power Monitoring"  // - no power monitoring !
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_zigisuyh", deviceJoinName: "Wall Outlet with USB Universal"  // https://zigbee.blakadder.com/Zemismart_B90.html
+        //
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,000A,0004,0005,0006", outClusters: "0019", model: "TS0115", manufacturer: "_TYZB01_vkwryfdr", deviceJoinName: "UseeLink Power Strip"                       //https://community.hubitat.com/t/another-brick-in-the-wall-tuya-joins-the-zigbee-alliance/44152/28?u=kkossev
         // SiHAS Switch (2~6 Gang)
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0006,0019", outClusters: "0003,0004,0019", manufacturer: "ShinaSystem", model: "SBM300Z2", deviceJoinName: "SiHAS Switch 2-gang"
@@ -533,9 +540,10 @@ def initialize( str ) {
         initialize() 
     }
     else {
-        logInfo "initialize aborted!"
+        logInfo "initialize aborted! (str=${str})"
     }
 }
+
 def initialize() {
     logDebug "Initializing..."
     initializeVars(fullInit = true)
