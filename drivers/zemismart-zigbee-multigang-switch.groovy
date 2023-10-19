@@ -38,7 +38,9 @@
  *  Ver. 0.5.0  2023-03-13 kkossev - removed the Initialize capability and replaced it with a custom command
  *  Ver. 0.5.1  2023-04-15 kkossev - bugfix: initialize() was not called when a new device is paired; added _TZ3000_pfc7i3kt; added TS011F _TZ3000_18ejxno0 (2 gangs); _TZ3000_zmy1waw6 bug fix; added TS011F _TZ3000_yf8iuzil (2 gangs)
  *  Ver. 0.5.2  2023-06-10 kkossev - added TS0002 _TZ3000_5gey1ohx; unschedule all remaining jobs from previous drivers on initialize(); added _TZ3000_zigisuyh
+ *  Ver. 0.5.3  2023-10-19 kkossev - (dev. branch) - added TS0001 _TZ3000_agpdnnyd @Sekenenz; added TS011F _TZ3000_iy2c3n6p @tom.guelker
  *
+ *                                   TODO: add LIDL  // https://github.com/Koenkk/zigbee-herdsman-converters/blob/38bf79304292c380dc8366966aaefb71ca0b03da/src/devices/lidl.ts#L342     // https://community.hubitat.com/t/release-lidl-smart-home-drivers-with-device-health-status/86444/15?u=kkossev
  *                                   TODO: check a possible problem w/ initialize() : https://community.hubitat.com/t/driver-needed-for-moes-3-gang-smart-switch-module-ms-104cz/116449/15?u=kkossev 
  *                                   TODO: automatic logsOff()
  *                                   TODO: add healthCheck
@@ -50,9 +52,9 @@ import hubitat.device.HubAction
 import hubitat.device.Protocol
 import groovy.transform.Field
 
-def version() { "0.5.2" }
+def version() { "0.5.3" }
 
-def timeStamp() { "2023/06/10 5:58 PM" }
+def timeStamp() { "2023/10/19 7:00 AM" }
 
 @Field static final Boolean debug = false
 
@@ -76,6 +78,7 @@ metadata {
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS000F", manufacturer: "_TZ3000_m9af2l6g", deviceJoinName: "Tuya Zigbee Switch"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0001", manufacturer: "_TZ3000_oex7egmt", deviceJoinName: "Tuya 1 gang Zigbee switch MYQ-KLS01L"        //https://expo.tuya.com/product/601097
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0003,0004,0005,0006,E000,E001,0000", outClusters: "0019,000A", model: "TS0001", manufacturer: "_TZ3000_tqlv4ug4", deviceJoinName: "GIRIER Tuya ZigBee 3.0 Light Switch Module"  //https://community.hubitat.com/t/girier-tuya-zigbee-3-0-light-switch-module-smart-diy-breaker-1-2-3-4-gang-supports-2-way-control/104546
+        fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0001", manufacturer: "_TZ3000_agpdnnyd", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,0003,0004,0005,0006", outClusters: "0019", model: "TS0002", manufacturer: "Zemismart", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,000A,0004,0005,0006", outClusters: "0019", model: "TS0002", manufacturer: "_TZ3000_tas0zemd", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,000A,0004,0005,0006", outClusters: "0019", model: "TS0002", manufacturer: "_TYZB01_tas0zemd", deviceJoinName: "Zemismart Zigbee Switch Multi-Gang"
@@ -153,6 +156,13 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_cymsnfvf", deviceJoinName: "TS011F No Power Monitoring"  // - no power monitoring !
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_bfn1w0mm", deviceJoinName: "TS011F No Power Monitoring"  // - no power monitoring !
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_zigisuyh", deviceJoinName: "Wall Outlet with USB Universal"  // https://zigbee.blakadder.com/Zemismart_B90.html
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_vzopcetz", deviceJoinName: "Silvercrest 3 gang switch, with 4 USB (CZ)"
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_vmpbygs5", deviceJoinName: "Silvercrest 3 gang switch, with 4 USB (BS)"
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_4uf3d0ax", deviceJoinName: "Silvercrest 3 gang switch, with 4 USB (FR)"
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_1obwwnmq", deviceJoinName: "Silvercrest 3 gang switch, with 4 USB"
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_oznonj5q", deviceJoinName: "Silvercrest 3 gang switch, with 4 USB"
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_wzauvbcs", deviceJoinName: "Silvercrest 3 gang switch, with 4 USB (EU)"
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_iy2c3n6p", deviceJoinName: "Tuya Zigbee dual outlet wall socket"
         //
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,000A,0004,0005,0006", outClusters: "0019", model: "TS0115", manufacturer: "_TYZB01_vkwryfdr", deviceJoinName: "UseeLink Power Strip"                       //https://community.hubitat.com/t/another-brick-in-the-wall-tuya-joins-the-zigbee-alliance/44152/28?u=kkossev
         // SiHAS Switch (2~6 Gang)
@@ -444,9 +454,12 @@ def setupChildDevices() {
             if (device.data.manufacturer == '_TZ3000_zmy1waw6') {
                 buttons = 0
             } 
-            else if (device.data.manufacturer in ['_TZ3000_18ejxno0', '_TZ3000_yf8iuzil']) {
+            else if (device.data.manufacturer in ['_TZ3000_18ejxno0', '_TZ3000_yf8iuzil', '_TZ3000_iy2c3n6p']) {
                 buttons = 2
             } 
+            else if (device.data.manufacturer in ['_TZ3000_wzauvbcs', '_TZ3000_oznonj5q', '_TZ3000_1obwwnmq', '_TZ3000_4uf3d0ax', '_TZ3000_vzopcetz', '_TZ3000_vmpbygs5']) {
+                buttons = 3    // LIDL Silvercrest 3 gang switch, with 4 USB (EU, FR, CZ, BS)    // https://github.com/Koenkk/zigbee-herdsman-converters/blob/38bf79304292c380dc8366966aaefb71ca0b03da/src/devices/lidl.ts#L342
+            }         
             else {
                 buttons = 5
             }
