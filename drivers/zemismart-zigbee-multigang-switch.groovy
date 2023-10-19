@@ -54,7 +54,7 @@ import groovy.transform.Field
 
 def version() { "0.5.3" }
 
-def timeStamp() { "2023/10/19 7:00 AM" }
+def timeStamp() { "2023/10/19 7:03 AM" }
 
 @Field static final Boolean debug = false
 
@@ -156,13 +156,13 @@ metadata {
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_cymsnfvf", deviceJoinName: "TS011F No Power Monitoring"  // - no power monitoring !
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_bfn1w0mm", deviceJoinName: "TS011F No Power Monitoring"  // - no power monitoring !
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_zigisuyh", deviceJoinName: "Wall Outlet with USB Universal"  // https://zigbee.blakadder.com/Zemismart_B90.html
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0003,0004,0005,0006,E000,E001,0000", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_iy2c3n6p", deviceJoinName: "Tuya Zigbee dual outlet wall socket"  // https://community.hubitat.com/t/dual-zigbee-outlet/126216?u=kkossev
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_vzopcetz", deviceJoinName: "Silvercrest 3 gang switch, with 4 USB (CZ)"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_vmpbygs5", deviceJoinName: "Silvercrest 3 gang switch, with 4 USB (BS)"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_4uf3d0ax", deviceJoinName: "Silvercrest 3 gang switch, with 4 USB (FR)"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_1obwwnmq", deviceJoinName: "Silvercrest 3 gang switch, with 4 USB"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_oznonj5q", deviceJoinName: "Silvercrest 3 gang switch, with 4 USB"
         fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_wzauvbcs", deviceJoinName: "Silvercrest 3 gang switch, with 4 USB (EU)"
-        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006", outClusters:"0019,000A", model:"TS011F", manufacturer:"_TZ3000_iy2c3n6p", deviceJoinName: "Tuya Zigbee dual outlet wall socket"
         //
         fingerprint profileId: "0104", endpointId: "01", inClusters: "0000,000A,0004,0005,0006", outClusters: "0019", model: "TS0115", manufacturer: "_TYZB01_vkwryfdr", deviceJoinName: "UseeLink Power Strip"                       //https://community.hubitat.com/t/another-brick-in-the-wall-tuya-joins-the-zigbee-alliance/44152/28?u=kkossev
         // SiHAS Switch (2~6 Gang)
