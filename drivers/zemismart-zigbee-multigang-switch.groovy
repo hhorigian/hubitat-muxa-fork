@@ -39,7 +39,7 @@
  *  Ver. 0.5.1  2023-04-15 kkossev - bugfix: initialize() was not called when a new device is paired; added _TZ3000_pfc7i3kt; added TS011F _TZ3000_18ejxno0 (2 gangs); _TZ3000_zmy1waw6 bug fix; added TS011F _TZ3000_yf8iuzil (2 gangs)
  *  Ver. 0.5.2  2023-06-10 kkossev - added TS0002 _TZ3000_5gey1ohx; unschedule all remaining jobs from previous drivers on initialize(); added _TZ3000_zigisuyh
  *  Ver. 0.5.3  2023-10-19 kkossev - added TS0001 _TZ3000_agpdnnyd @Sekenenz; added TS011F _TZ3000_iy2c3n6p @tom.guelker
- *  Ver. 0.5.4  2023-10-29 kkossev - (dev. branch) - added TS0002 _TZ3000_qcgw8qfa
+ *  Ver. 0.5.4  2023-10-29 kkossev - added TS0002 _TZ3000_qcgw8qfa
  *
  *                                   TODO: add LIDL  // https://github.com/Koenkk/zigbee-herdsman-converters/blob/38bf79304292c380dc8366966aaefb71ca0b03da/src/devices/lidl.ts#L342     // https://community.hubitat.com/t/release-lidl-smart-home-drivers-with-device-health-status/86444/15?u=kkossev
  *                                   TODO: check a possible problem w/ initialize() : https://community.hubitat.com/t/driver-needed-for-moes-3-gang-smart-switch-module-ms-104cz/116449/15?u=kkossev 
