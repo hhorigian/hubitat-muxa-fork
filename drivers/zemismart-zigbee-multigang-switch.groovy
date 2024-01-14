@@ -41,7 +41,7 @@
  *  Ver. 0.5.2  2023-06-10 kkossev - added TS0002 _TZ3000_5gey1ohx; unschedule all remaining jobs from previous drivers on initialize(); added _TZ3000_zigisuyh
  *  Ver. 0.5.3  2023-10-19 kkossev - added TS0001 _TZ3000_agpdnnyd @Sekenenz; added TS011F _TZ3000_iy2c3n6p @tom.guelker
  *  Ver. 0.5.4  2023-10-29 kkossev - added TS0002 _TZ3000_qcgw8qfa
- *  Ver. 0.6.0  2024-01-14 kkossev - Groovy lint;
+ *  Ver. 0.6.0  2024-01-14 kkossev - Groovy lint; TS0004 _TZ3000_a37eix1s fingerprint correction @Rafael;
  *
  *                                   TODO: add LIDL  // https://github.com/Koenkk/zigbee-herdsman-converters/blob/38bf79304292c380dc8366966aaefb71ca0b03da/src/devices/lidl.ts#L342     // https://community.hubitat.com/t/release-lidl-smart-home-drivers-with-device-health-status/86444/15?u=kkossev
  *                                   TODO: check a possible problem w/ initialize() : https://community.hubitat.com/t/driver-needed-for-moes-3-gang-smart-switch-module-ms-104cz/116449/15?u=kkossev
@@ -57,7 +57,7 @@ import groovy.transform.Field
 import com.hubitat.app.DeviceWrapper
 
 def version() { '0.6.0' }
-def timeStamp() { '2024/01/14 9:42 PM' }
+def timeStamp() { '2024/01/14 10:38 PM' }
 
 @Field static final Boolean debug = false
 
@@ -113,7 +113,7 @@ metadata {
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,0702,0B04,E000,E001,0000', outClusters: '0019,000A', model: 'TS0003', manufacturer: '_TZ3000_pfc7i3kt', deviceJoinName: 'MOES Tuya Zigebee Module'    // https://community.hubitat.com/t/driver-needed-for-moes-3-gang-smart-switch-module-ms-104cz/116449?u=kkossev
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006', outClusters: '0019', model: 'TS0004', manufacturer: '_TZ3000_ltt60asa', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'        // check!
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006', outClusters: '0019', model: 'TS0004', manufacturer: '_TZ3000_excgg5kb', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'        // check!
-        fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006', outClusters: '0019', model: 'TS0004', manufacturer: '_TZ3000_a37eix1s', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'        // check!
+        fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006,E000,E001', outClusters: '0019,000A', model: 'TS0004', manufacturer: '_TZ3000_a37eix1s', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'        // @Rafael 
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,000A,0004,0005,0006', outClusters: '0019', model: 'TS0004', manufacturer: '_TZ3000_go9rahj5', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001', outClusters: '0019', model: 'TS0004', manufacturer: '_TZ3000_aqgofyol', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0004', manufacturer: '_TZ3000_excgg5kb'        // 4-relays module
