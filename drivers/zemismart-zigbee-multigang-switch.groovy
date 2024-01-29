@@ -42,6 +42,7 @@
  *  Ver. 0.5.3  2023-10-19 kkossev - added TS0001 _TZ3000_agpdnnyd @Sekenenz; added TS011F _TZ3000_iy2c3n6p @tom.guelker
  *  Ver. 0.5.4  2023-10-29 kkossev - added TS0002 _TZ3000_qcgw8qfa
  *  Ver. 0.6.0  2024-01-14 kkossev - Groovy lint; TS0004 _TZ3000_a37eix1s fingerprint correction @Rafael;
+ *  Ver. 0.6.1  2024-01-29 kkossev - added TS011F _TZ3000_pmz6mjyu @g.machado
  *
  *                                   TODO: add LIDL  // https://github.com/Koenkk/zigbee-herdsman-converters/blob/38bf79304292c380dc8366966aaefb71ca0b03da/src/devices/lidl.ts#L342     // https://community.hubitat.com/t/release-lidl-smart-home-drivers-with-device-health-status/86444/15?u=kkossev
  *                                   TODO: check a possible problem w/ initialize() : https://community.hubitat.com/t/driver-needed-for-moes-3-gang-smart-switch-module-ms-104cz/116449/15?u=kkossev
@@ -56,8 +57,8 @@ import hubitat.device.Protocol
 import groovy.transform.Field
 import com.hubitat.app.DeviceWrapper
 
-def version() { '0.6.0' }
-def timeStamp() { '2024/01/14 10:38 PM' }
+def version() { '0.6.1' }
+def timeStamp() { '2024/01/29 7:46 AM' }
 
 @Field static final Boolean debug = false
 
@@ -158,6 +159,7 @@ metadata {
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0003,0004,0005,0006,E000,E001,0000', outClusters:'0019,000A', model:'TS011F', manufacturer:'_TZ3000_bfn1w0mm', deviceJoinName: 'TS011F No Power Monitoring'  // - no power monitoring !
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0003,0004,0005,0006,E000,E001,0000', outClusters:'0019,000A', model:'TS011F', manufacturer:'_TZ3000_zigisuyh', deviceJoinName: 'Wall Outlet with USB Universal'  // https://zigbee.blakadder.com/Zemismart_B90.html
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0003,0004,0005,0006,E000,E001,0000', outClusters:'0019,000A', model:'TS011F', manufacturer:'_TZ3000_iy2c3n6p', deviceJoinName: 'Tuya Zigbee dual outlet wall socket'  // https://community.hubitat.com/t/dual-zigbee-outlet/126216?u=kkossev
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,E000,E001', outClusters:'0019,000A', model:'TS011F', manufacturer:'_TZ3000_pmz6mjyu', deviceJoinName: 'Tuya Zigbee dual outlet wall socket'  // @g.machado
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006', outClusters:'0019,000A', model:'TS011F', manufacturer:'_TZ3000_vzopcetz', deviceJoinName: 'Silvercrest 3 gang switch, with 4 USB (CZ)'
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006', outClusters:'0019,000A', model:'TS011F', manufacturer:'_TZ3000_vmpbygs5', deviceJoinName: 'Silvercrest 3 gang switch, with 4 USB (BS)'
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006', outClusters:'0019,000A', model:'TS011F', manufacturer:'_TZ3000_4uf3d0ax', deviceJoinName: 'Silvercrest 3 gang switch, with 4 USB (FR)'
@@ -460,7 +462,7 @@ def setupChildDevices() {
             if (device.data.manufacturer == '_TZ3000_zmy1waw6') {
                 buttons = 0
             }
-            else if (device.data.manufacturer in ['_TZ3000_18ejxno0', '_TZ3000_yf8iuzil', '_TZ3000_iy2c3n6p']) {
+            else if (device.data.manufacturer in ['_TZ3000_18ejxno0', '_TZ3000_yf8iuzil', '_TZ3000_iy2c3n6p', '_TZ3000_pmz6mjyu']) {
                 buttons = 2
             }
             else if (device.data.manufacturer in ['_TZ3000_wzauvbcs', '_TZ3000_oznonj5q', '_TZ3000_1obwwnmq', '_TZ3000_4uf3d0ax', '_TZ3000_vzopcetz', '_TZ3000_vmpbygs5']) {
