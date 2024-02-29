@@ -1,4 +1,4 @@
-/* groovylint-disable CompileStatic, DuplicateNumberLiteral, DuplicateStringLiteral, ImplicitClosureParameter, ImplicitReturnStatement, LineLength, MethodCount, MethodParameterTypeRequired, MethodReturnTypeRequired, NoDef, ReturnNullFromCatchBlock, UnnecessaryGetter */
+/* groovylint-disable CompileStatic, DuplicateNumberLiteral, DuplicateStringLiteral, ImplicitClosureParameter, ImplicitReturnStatement, LineLength, MethodCount, MethodReturnTypeRequired, PublicMethodsBeforeNonPublicMethods, ReturnNullFromCatchBlock, StaticMethodsBeforeInstanceMethods, UnnecessaryGetter */
 /**
  *  Zemismart ZigBee Wall Switch Multi-Gang - Device Driver for Hubitat Elevation hub
  *
@@ -43,6 +43,7 @@
  *  Ver. 0.5.4  2023-10-29 kkossev - added TS0002 _TZ3000_qcgw8qfa
  *  Ver. 0.6.0  2024-01-14 kkossev - Groovy lint; TS0004 _TZ3000_a37eix1s fingerprint correction @Rafael;
  *  Ver. 0.6.1  2024-01-29 kkossev - added TS011F _TZ3000_pmz6mjyu @g.machado
+ *  Ver. 0.7.0  2024-02-29 kkossev - (dev. branch) more Groovy lint; E000_D003 exception processing; ignored duplicated on/off events for the parent device; added ping() and rtt measurement;
  *
  *                                   TODO: add LIDL  // https://github.com/Koenkk/zigbee-herdsman-converters/blob/38bf79304292c380dc8366966aaefb71ca0b03da/src/devices/lidl.ts#L342     // https://community.hubitat.com/t/release-lidl-smart-home-drivers-with-device-health-status/86444/15?u=kkossev
  *                                   TODO: check a possible problem w/ initialize() : https://community.hubitat.com/t/driver-needed-for-moes-3-gang-smart-switch-module-ms-104cz/116449/15?u=kkossev
@@ -56,11 +57,14 @@ import hubitat.device.HubAction
 import hubitat.device.Protocol
 import groovy.transform.Field
 import com.hubitat.app.DeviceWrapper
+import com.hubitat.app.ChildDeviceWrapper
 
-def version() { '0.6.1' }
-def timeStamp() { '2024/01/29 7:46 AM' }
+static String version() { '0.7.0' }
+static String timeStamp() { '2024/02/29 11:56 PM' }
 
 @Field static final Boolean debug = false
+@Field static final Integer MAX_PING_MILISECONDS = 10000     // rtt more than 10 seconds will be ignored
+@Field static final Integer COMMAND_TIMEOUT = 10             // timeout time in seconds
 
 metadata {
     definition(name: 'Zemismart ZigBee Wall Switch Multi-Gang', namespace: 'muxa', author: 'Muxa', importUrl: 'https://raw.githubusercontent.com/kkossev/hubitat-muxa-fork/development/drivers/zemismart-zigbee-multigang-switch.groovy', singleThreaded: true) {
@@ -75,7 +79,7 @@ metadata {
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0001', manufacturer: '_TZ3000_hktqahrq', deviceJoinName: 'Tuya Zigbee Switch'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0001', manufacturer: '_TZ3000_mx3vgyea', deviceJoinName: 'Tuya Zigbee Switch'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0001', manufacturer: '_TZ3000_5ng23zjs', deviceJoinName: 'Tuya Zigbee Switch'
-        fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0001', manufacturer: '_TZ3000_rmjr4ufz', deviceJoinName: 'Tuya Zigbee Switch'
+        fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0001', manufacturer: '_TZ3000_rmjr4ufz', deviceJoinName: 'Tuya Zigbee Switch IHSW02'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0001', manufacturer: '_TZ3000_v7gnj3ad', deviceJoinName: 'Tuya Zigbee Switch'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0001', manufacturer: '_TZ3000_qsp2pwtf', deviceJoinName: 'Tuya Zigbee Switch'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS000F', manufacturer: '_TZ3000_m9af2l6g', deviceJoinName: 'Tuya Zigbee Switch'
@@ -114,7 +118,7 @@ metadata {
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,0702,0B04,E000,E001,0000', outClusters: '0019,000A', model: 'TS0003', manufacturer: '_TZ3000_pfc7i3kt', deviceJoinName: 'MOES Tuya Zigebee Module'    // https://community.hubitat.com/t/driver-needed-for-moes-3-gang-smart-switch-module-ms-104cz/116449?u=kkossev
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006', outClusters: '0019', model: 'TS0004', manufacturer: '_TZ3000_ltt60asa', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'        // check!
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006', outClusters: '0019', model: 'TS0004', manufacturer: '_TZ3000_excgg5kb', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'        // check!
-        fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006,E000,E001', outClusters: '0019,000A', model: 'TS0004', manufacturer: '_TZ3000_a37eix1s', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'        // @Rafael 
+        fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006,E000,E001', outClusters: '0019,000A', model: 'TS0004', manufacturer: '_TZ3000_a37eix1s', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'        // @Rafael
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,000A,0004,0005,0006', outClusters: '0019', model: 'TS0004', manufacturer: '_TZ3000_go9rahj5', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001', outClusters: '0019', model: 'TS0004', manufacturer: '_TZ3000_aqgofyol', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0004', manufacturer: '_TZ3000_excgg5kb'        // 4-relays module
@@ -194,11 +198,13 @@ metadata {
             command 'test', ['string']
         }
 
-        attribute 'lastCheckin', 'string'
+        //attribute 'lastCheckin', 'string'
+        attribute 'rtt', 'number'
+
     }
     preferences {
-        input(name: 'logEnable', type: 'bool', title: 'Enable debug logging', defaultValue: true)
         input(name: 'txtEnable', type: 'bool', title: 'Enable description text logging', defaultValue: true)
+        input(name: 'logEnable', type: 'bool', title: 'Enable debug logging', defaultValue: true)
         input(title: 'IMPORTANT', description: '<b>In order to operate normally, please pair the device to HE after changing to this driver!</b>', type: 'paragraph', element: 'paragraph')
     }
 }
@@ -214,9 +220,9 @@ private boolean noBindingButPolling() {
 
 // Parse incoming device messages to generate events
 
-def parse(String description) {
+void parse(String description) {
     checkDriverVersion()
-    //log.debug "${device.displayName} Parsing '${description}'"
+    unschedule('deviceCommandTimeout')
     Map descMap = [:]
     try {
         descMap = zigbee.parseDescriptionAsMap(description)
@@ -227,44 +233,36 @@ def parse(String description) {
     }
     logDebug "Parsed descMap: ${descMap} (description:${description})"
 
-    //Map map = null // [:]
-
     if (descMap.attrId != null) {
         //log.trace "parsing descMap.attrId ${descMap.attrId}"
         parseAttributes(descMap)
         return
     }
-    /*
-    else if (descMap.cluster == "0006" && descMap.attrId == "0000") {
-       processOnOff( descMap )
-    } // OnOff cluster, attrId "0000"
-    else if (descMap.cluster == "0006" && descMap.attrId != "0000") { // other attr
-        processOnOfClusterOtherAttr( descMap )
-    }
-    else if (descMap.cluster == "E001") { // Tuya Switch Mode cluster
-        processOnOfClusterOtherAttr( descMap )
-    }
-    */
     else if (descMap?.clusterId == '0013' && descMap?.profileId != null && descMap?.profileId == '0000') {
         logInfo "device model ${device.data.model}, manufacturer ${device.data.manufacturer} <b>re-joined the network</b> (deviceNetworkId ${device.properties.deviceNetworkId}, zigbeeId ${device.properties.zigbeeId})"
+    } else if (descMap?.clusterId == '0006' && descMap?.profileId != null && descMap?.profileId == '0000') {
+        logInfo "Match Descriptor Request (deviceNetworkId ${device.properties.deviceNetworkId}, zigbeeId ${device.properties.zigbeeId})"
+    } else if (descMap?.clusterId == '8021' && descMap?.profileId != null && descMap?.profileId == '0000') {
+        logInfo "Bind Response (deviceNetworkId ${device.properties.deviceNetworkId}, zigbeeId ${device.properties.zigbeeId})"
+    } else if (descMap?.profileId != null && descMap?.command == '07') {
+        parseConfigureResponse(descMap) 
     } else {
-        logDebug "${device.displayName} unprocessed EP: ${descMap.sourceEndpoint} cluster: ${descMap.clusterId} attrId: ${descMap.attrId}"
+        logDebug "${device.displayName} unprocessed EP: ${descMap.sourceEndpoint} cluster: ${descMap.clusterId} command: ${descMap?.command} attrId: ${descMap.attrId}"
     }
 }
 
-def parseAttributes(Map descMap) {
+void parseAttributes(final Map descMap) {
     // attribute report received
     List attrData = [[cluster: descMap.cluster, attrId: descMap.attrId, value: descMap.value, status: descMap.status]]
     descMap.additionalAttrs.each {
         attrData << [cluster: descMap.cluster, attrId: it.attrId, value: it.value, status: it.status]
     }
-    //log.trace "attrData 2 = ${attrData} "
     attrData.each {
         parseSingleAttribute(it, descMap)
-    } // for each attribute
+    }
 }
 
-private void parseSingleAttribute(Map it, Map descMap) {
+private void parseSingleAttribute(final Map it, final Map descMap) {
     //log.trace "parseSingleAttribute :${it}"
     if (it.status == '86') {
         log.warn "${device.displayName} Read attribute response: unsupported Attributte ${it.attrId} cluster ${descMap.cluster}"
@@ -319,13 +317,33 @@ private void parseSingleAttribute(Map it, Map descMap) {
     } // it.cluster
 }
 
-def parseBasicClusterAttribute(Map it) {
+void parseBasicClusterAttribute(final Map it) {
     // https://github.com/zigbeefordomoticz/Domoticz-Zigbee/blob/6df64ab4656b65ec1a450bd063f71a350c18c92e/Modules/readClusters.py
     switch (it.attrId) {
         case '0000':
             logDebug "ZLC version: ${it.value}"        // default 0x03
             break
         case '0001':
+            if (state.states == null) { state.states = [:] }
+            if (state.stats == null) { state.stats = [:] }
+            if (state.lastTx == null) { state.lastTx = [:] }
+            Long now = new Date().getTime()
+            boolean isPing = state.states['isPing'] ?: false
+            if (isPing) {
+                def timeRunning = now.toInteger() - (state.lastTx['pingTime'] ?: '0').toInteger()
+                if (timeRunning > 0 && timeRunning < MAX_PING_MILISECONDS) {
+                    state.stats['pingsOK'] = (state.stats['pingsOK'] ?: 0) + 1
+                    if (timeRunning < safeToInt((state.stats['pingsMin'] ?: '999'))) { state.stats['pingsMin'] = timeRunning }
+                    if (timeRunning > safeToInt((state.stats['pingsMax'] ?: '0')))   { state.stats['pingsMax'] = timeRunning }
+                    state.stats['pingsAvg'] = approxRollingAverage(safeToDouble(state.stats['pingsAvg']), safeToDouble(timeRunning)) as int
+                    sendRttEvent()
+                }
+                else {
+                    logWarn "unexpected ping timeRunning=${timeRunning} "
+                }
+                state.states['isPing'] = false
+            }
+
             logDebug "Applicaiton version: ${it.value}"    // For example, 0b 01 00 0001 = 1.0.1, where 0x41 is 1.0.1
             break                                                            // https://developer.tuya.com/en/docs/iot-device-dev/tuya-zigbee-lighting-dimmer-swith-access-standard?id=K9ik6zvlvbqyw
         case '0002':
@@ -339,6 +357,9 @@ def parseBasicClusterAttribute(Map it) {
             break
         case '0005':
             logDebug "Model Identifier: ${it.value}"
+            break
+        case '0006':
+            logDebug "DateCode: ${it.value}"
             break
         case '0007':
             logDebug "Power Source: ${it.value}"        // enum8-0x30 default 0x03
@@ -362,14 +383,79 @@ def parseBasicClusterAttribute(Map it) {
     }
 }
 
+@Field static final int ROLLING_AVERAGE_N = 10
+BigDecimal approxRollingAverage(BigDecimal avg, BigDecimal newSample) {
+    if (avg == null || avg == 0) { avg = newSample }
+    avg -= avg / ROLLING_AVERAGE_N
+    avg += newSample / ROLLING_AVERAGE_N
+    return avg
+}
+
+/**
+ * sends 'rtt'event (after a ping() command)
+ * @param null: calculate the RTT in ms
+ *        value: send the text instead ('timeout', 'n/a', etc..)
+ * @return none
+ */
+void sendRttEvent( String value=null) {
+    def now = new Date().getTime()
+    if (state.stats == null ) { state.stats = [:] }
+    if (state.lastTx == null ) { state.lastTx = [:] }
+    def timeRunning = now.toInteger() - (state.lastTx['pingTime'] ?: now).toInteger()
+    def descriptionText = "Round-trip time is ${timeRunning} ms (min=${state.stats['pingsMin']} max=${state.stats['pingsMax']} average=${state.stats['pingsAvg']})"
+    if (value == null) {
+        logInfo "${descriptionText}"
+        sendEvent(name: 'rtt', value: timeRunning, descriptionText: descriptionText, unit: 'ms', isDigital: true)
+    }
+    else {
+        descriptionText = "Round-trip time : ${value}"
+        logInfo "${descriptionText}"
+        sendEvent(name: 'rtt', value: value, descriptionText: descriptionText, isDigital: true)
+    }
+}
+
+void ping() {
+    if (state.lastTx == null ) { state.lastTx = [:] }
+    state.lastTx['pingTime'] = new Date().getTime()
+    if (state.states == null ) { state.states = [:] }
+    state.states['isPing'] = true
+    scheduleCommandTimeoutCheck()
+    sendZigbeeCommands(zigbee.readAttribute(zigbee.BASIC_CLUSTER, 0x01, [:], 0))
+    logDebug 'ping...'
+}
+
+private void scheduleCommandTimeoutCheck(int delay = COMMAND_TIMEOUT) {
+    runIn(delay, 'deviceCommandTimeout')
+}
+
+void deviceCommandTimeout() {
+    logWarn 'no response received (sleepy device or offline?)'
+    sendRttEvent('timeout')
+    state.stats['pingsFail'] = (state.stats['pingsFail'] ?: 0) + 1
+}
+
+/**
+ * Zigbee Configure Reporting Response Parsing  - command 0x07
+ */
+void parseConfigureResponse(final Map descMap) {
+    // TODO - parse the details of the configuration respose - cluster, min, max, delta ...
+    final String status = ((List)descMap.data).first()
+    final int statusCode = hexStrToUnsignedInt(status)
+    final String statusName = statusCode == 0 ? "Success" : "0x${status}"
+    if (statusCode > 0x00) {
+        log.warn "zigbee configure reporting error: ${statusName} ${descMap.data}"
+    } else {
+        if (logEnable) { logInfo "zigbee configure reporting response: ${statusName} ${descMap.data}" }
+    }
+}
+
+
 /* groovylint-disable-next-line UnusedMethodParameter */
-def processOnOff(it, descMap) {
+void processOnOff(final Map it, final Map descMap) {
     // descMap.command =="0A" - switch toggled physically
     // descMap.command =="01" - get switch status
-    /* groovylint-disable-next-line VariableTypeRequired */
     // descMap.command =="0B" - command response
-    /* groovylint-disable-next-line VariableTypeRequired */
-    def cd = getChildDevice("${device.id}-${descMap.endpoint}")
+    ChildDeviceWrapper cd = getChildDevice("${device.id}-${descMap.endpoint}")
     if (cd == null) {
         if (!(device.data.model in ['TS0011', 'TS0001'])) {
             log.warn "${device.displayName} Child device ${device.id}-${descMap.endpoint} not found. Initialise parent device first"
@@ -387,8 +473,12 @@ def processOnOff(it, descMap) {
         }
     }
     if (switchAttribute == 'on') {
-        logDebug 'Parent switch on'
+        if (device.currentValue('switch') == 'on') {
+            logDebug 'switch is already on'
+            return
+        }
         sendEvent(name: 'switch', value: 'on')
+        logInfo 'switch is on'
         return
     } else if (switchAttribute == 'off') {
         int cdsOn = 0
@@ -399,58 +489,57 @@ def processOnOff(it, descMap) {
             }
         }
         if (cdsOn == 0) {
-            logDebug 'Parent switch off'
+            if (device.currentValue('switch') == 'off') {
+                logDebug 'switch is already off'
+                return
+            }
             sendEvent(name: 'switch', value: 'off')
+            logInfo 'switch is off'
             return
         }
     }
 }
 
-def off() {
+void off() {
     if (settings?.txtEnable) { log.info "${device.displayName} Turning all child switches off" }
-    "he cmd 0x${device.deviceNetworkId} 0xFF 0x0006 0x0 {}"
+    sendZigbeeCommands(["he cmd 0x${device.deviceNetworkId} 0xFF 0x0006 0x0 {}"])
 }
 
-def on() {
+void on() {
     if (settings?.txtEnable) { log.info "${device.displayName} Turning all child switches on" }
-    "he cmd 0x${device.deviceNetworkId} 0xFF 0x0006 0x1 {}"
+    sendZigbeeCommands(["he cmd 0x${device.deviceNetworkId} 0xFF 0x0006 0x1 {}"])
 }
 
-def refresh() {
+void refresh() {
     logDebug 'refreshing'
-    "he rattr 0x${device.deviceNetworkId} 0xFF 0x0006 0x0"
+    sendZigbeeCommands(["he rattr 0x${device.deviceNetworkId} 0xFF 0x0006 0x0"])
 }
 
-def ping() {
-    refresh()
-}
-
-/* groovylint-disable-next-line MethodParameterTypeRequired, UnusedPrivateMethod */
-private Integer convertHexToInt(hex) {
+/* groovylint-disable-next-line UnusedPrivateMethod */
+private Integer convertHexToInt(String hex) {
     Integer.parseInt(hex, 16)
 }
 
-/* groovylint-disable-next-line MethodParameterTypeRequired */
-private String getChildId(childDevice) {
+private String getChildId(DeviceWrapper childDevice) {
     return childDevice.deviceNetworkId.substring(childDevice.deviceNetworkId.length() - 2)
 }
 
-def componentOn(childDevice) {
+void componentOn(DeviceWrapper childDevice) {
     logDebug "sending componentOn ${childDevice.deviceNetworkId}"
     sendHubCommand(new HubAction("he cmd 0x${device.deviceNetworkId} 0x${getChildId(childDevice)} 0x0006 0x1 {}", Protocol.ZIGBEE))
 }
 
-def componentOff(childDevice) {
+void componentOff(DeviceWrapper childDevice) {
     logDebug "sending componentOff ${childDevice.deviceNetworkId}"
     sendHubCommand(new HubAction("he cmd 0x${device.deviceNetworkId} 0x${getChildId(childDevice)} 0x0006 0x0 {}", Protocol.ZIGBEE))
 }
 
-def componentRefresh(childDevice) {
+void componentRefresh(DeviceWrapper childDevice) {
     logDebug "sending componentRefresh ${childDevice.deviceNetworkId} ${childDevice}"
     sendHubCommand(new HubAction("he rattr 0x${device.deviceNetworkId} 0x${getChildId(childDevice)} 0x0006 0x0", Protocol.ZIGBEE))
 }
 
-def setupChildDevices() {
+void setupChildDevices() {
     logDebug 'Parent setupChildDevices'
     deleteObsoleteChildren()
     Integer buttons = 0
@@ -505,8 +594,8 @@ def setupChildDevices() {
     createChildDevices((int) buttons)
 }
 
-/* groovylint-disable-next-line FactoryMethodName */
-def createChildDevices(int buttons) {
+/* groovylint-disable-next-line BuilderMethodWithSideEffects, FactoryMethodName */
+void createChildDevices(int buttons) {
     logDebug 'Parent createChildDevices'
     if (buttons == 0) { return }
     for (i in 1..buttons) {
@@ -522,7 +611,7 @@ def createChildDevices(int buttons) {
     }
 }
 
-def deleteObsoleteChildren() {
+void deleteObsoleteChildren() {
     logDebug 'Parent deleteChildren'
     getChildDevices().each { child ->
         if (!child.deviceNetworkId.startsWith(device.id) || child.deviceNetworkId == "${device.id}-00") {
@@ -532,9 +621,9 @@ def deleteObsoleteChildren() {
     }
 }
 
-def driverVersionAndTimeStamp() { version() + ' ' + timeStamp() }
+static String driverVersionAndTimeStamp() { version() + ' ' + timeStamp() }
 
-def checkDriverVersion() {
+void checkDriverVersion() {
     if (state.driverVersion == null || (driverVersionAndTimeStamp() != state.driverVersion)) {
         if (txtEnable == true) { log.debug "${device.displayName} updating the settings from the current driver ${device.properties.typeName} version ${state.driverVersion} to the new version ${driverVersionAndTimeStamp()} [model ${device.data.model}, manufacturer ${device.data.manufacturer}, application ${device.data.application}, endpointId ${device.endpointId}]" }
         initializeVars(fullInit = false)
@@ -553,7 +642,7 @@ void initializeVars(boolean fullInit = true) {
     if (settings?.txtEnable == null) { device.updateSetting('txtEnable', true) }
 }
 
-def initialize( str ) {
+void initialize(final String str) {
     if (str == 'Yes') {
         initialize()
     }
@@ -562,31 +651,31 @@ def initialize( str ) {
     }
 }
 
-def initialize() {
+void initialize() {
     logDebug 'Initializing...'
     initializeVars(fullInit = true)
     configure()    // added 11/12/2022
     setupChildDevices()
 }
 
-def installed() {
+void installed() {
     logInfo "<b>Parent installed</b>, typeName ${device.properties.typeName}, version ${driverVersionAndTimeStamp()}, deviceNetworkId ${device.properties.deviceNetworkId}, zigbeeId ${device.properties.zigbeeId}"
     logInfo "model ${device.data.model}, manufacturer ${device.data.manufacturer}, application ${device.data.application}, endpointId ${device.endpointId}"
     initialize()
 }
 
-def updated() {
+void updated() {
     logDebug 'Parent updated'
 }
 
-def tuyaBlackMagic() {
+List<String> tuyaBlackMagic() {
     List<String> cmds = []
     cmds += zigbee.readAttribute(0x0000, [0x0004, 0x0000, 0x0001, 0x0005, 0x0007, 0xfffe], [:], delay = 200)
     cmds += zigbee.writeAttribute(0x0000, 0xffde, 0x20, 0x0d, [destEndpoint: 0x01], delay = 50)
     return cmds
 }
 
-def configure() {
+void configure() {
     logDebug ' configure()..'
     List<String> cmds = []
     if (device.data.manufacturer in ['_TZ3000_cfnprab5', '_TZ3000_okaz9tjs']) {
@@ -613,17 +702,34 @@ void sendZigbeeCommands(List<String> cmds) {
     sendHubCommand(new hubitat.device.HubMultiAction(cmds, hubitat.device.Protocol.ZIGBEE))
 }
 
-def logDebug(msg) {
+static Integer safeToInt(val, Integer defaultVal=0) {
+    return "${val}"?.isInteger() ? "${val}".toInteger() : defaultVal
+}
+
+static Double safeToDouble(val, Double defaultVal=0.0) {
+    return "${val}"?.isDouble() ? "${val}".toDouble() : defaultVal
+}
+
+static BigDecimal safeToBigDecimal(val, BigDecimal defaultVal=0.0) {
+    return "${val}"?.isBigDecimal() ? "${val}".toBigDecimal() : defaultVal
+}
+
+void logDebug(final String msg) {
     String sDnMsg = device?.displayName + ' ' + msg
     if (settings?.logEnable) { log.debug sDnMsg }
 }
 
-def logInfo(msg) {
+void logWarn(final String msg) {
+    String sDnMsg = device?.displayName + ' ' + msg
+    if (settings?.logEnable) { log.warn sDnMsg }
+}
+
+void logInfo(final String msg) {
     String sDnMsg = device?.displayName + ' ' + msg
     if (settings?.txtEnable) { log.info sDnMsg }
 }
 
-def powerOnState(relayMode) {
+void powerOnState(final String relayMode) {
     List<String> cmds = []
     int modeEnum = 99
     switch (relayMode) {
@@ -645,8 +751,7 @@ def powerOnState(relayMode) {
     sendZigbeeCommands(cmds)
 }
 
-/* groovylint-disable-next-line MethodParameterTypeRequired */
-def switchType(type) {
+void switchType(final String type) {
     List<String> cmds = []
     int modeEnum = 99
     switch (type) {
@@ -671,8 +776,7 @@ def switchType(type) {
 //  mode = value == 0 ? "Disabled"  : value == 1 ? "Lit when On" : value == 2 ? "Lit when Off" : null
 // [name:"ledMode",    type: "ENUM",   constraints: ["--- Select ---", "Disabled", "Lit when On", "Lit when Off], description: "Select LED Mode"]
 
-/* groovylint-disable-next-line MethodParameterTypeRequired */
-def ledMode(mode) {
+void ledMode(final String mode) {
     List<String> cmds = []
     int modeEnum = 99
     switch (mode) {
@@ -694,16 +798,17 @@ def ledMode(mode) {
     sendZigbeeCommands(cmds)
 }
 
-void processOnOfClusterOtherAttr(Map it) {
-    //logDebug "processOnOfClusterOtherAttr attribute ${it.attrId} value=${it.value}"
-    String mode
-    String attrName
-    Integer value
+void processOnOfClusterOtherAttr(final Map it) {
+    logDebug "processOnOfClusterOtherAttr attribute ${it}"
+    String mode = null
+    String attrName = null
+    Integer value = null
+    String valueStr = it.value
     try {
-        value = it.value as int
+        value = Integer.parseInt(it.value)
     }
     catch (e) {
-        value = it.value
+        logDebug "processOnOfClusterOtherAttr: EXCEPTION ${e} while processing attrId: ${it.attrId} value: ${it.value} as Integer. Using valueStr instead."
     }
     String clusterPlusAttr = it.cluster + '_' + it.attrId
     //log.trace "clusterPlusAttr = ${clusterPlusAttr}"
@@ -727,9 +832,9 @@ void processOnOfClusterOtherAttr(Map it) {
             break
         case 'E000_D001':
         case 'E000_D002':
-        case 'E000_D003':
+        case 'E000_D003':   // encoding:42, command:0A, value:AAAA,
             attrName = 'attribute ' + clusterPlusAttr
-            mode = value.toString()
+            mode = value == null ? valueStr : value.toString()
             break
         case 'E001_D030':
             attrName = 'Switch Type'
@@ -739,11 +844,10 @@ void processOnOfClusterOtherAttr(Map it) {
             logDebug "processOnOfClusterOtherAttr: <b>UNPROCESSED On/Off Cluster</b>  attrId: ${it.attrId} value: ${it.value}"
             return
     }
-    if (txtEnable) { log.info "${device.displayName} ${attrName} is: ${mode} (${value})" }
+    if (logEnable) { log.info "${device.displayName} ${attrName} is: ${mode} (${value != null ? value : '?'})" }
 }
 
-/* groovylint-disable-next-line MethodParameterTypeRequired */
-def test(description) {
+void test(final String description) {
     log.warn "testing <b>${description}</b>"
     parse(description)
 }
