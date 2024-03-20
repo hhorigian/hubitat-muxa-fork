@@ -44,7 +44,7 @@
  *  Ver. 0.6.0  2024-01-14 kkossev - Groovy lint; TS0004 _TZ3000_a37eix1s fingerprint correction @Rafael;
  *  Ver. 0.6.1  2024-01-29 kkossev - added TS011F _TZ3000_pmz6mjyu @g.machado
  *  Ver. 0.7.0  2024-02-29 kkossev - (dev. branch) more Groovy lint; E000_D003 exception processing; ignored duplicated on/off events for the parent device; added ping() and rtt measurement;
- *  Ver. 0.7.1  2024-02-29 kkossev - (dev. branch) added TS0002 _TZ3000_ruldv5dt MCHOZY 2 channel relay;
+ *  Ver. 0.7.1  2024-03-20 kkossev - (dev. branch) added TS0002 _TZ3000_ruldv5dt MCHOZY 2 channel relay;
  *
  *                                   TODO: add LIDL  // https://github.com/Koenkk/zigbee-herdsman-converters/blob/38bf79304292c380dc8366966aaefb71ca0b03da/src/devices/lidl.ts#L342     // https://community.hubitat.com/t/release-lidl-smart-home-drivers-with-device-health-status/86444/15?u=kkossev
  *                                   TODO: check a possible problem w/ initialize() : https://community.hubitat.com/t/driver-needed-for-moes-3-gang-smart-switch-module-ms-104cz/116449/15?u=kkossev
@@ -60,8 +60,8 @@ import groovy.transform.Field
 import com.hubitat.app.DeviceWrapper
 import com.hubitat.app.ChildDeviceWrapper
 
-static String version() { '0.7.0' }
-static String timeStamp() { '2024/02/29 11:56 PM' }
+static String version() { '0.7.1' }
+static String timeStamp() { '2024/03/20 7:10 AM' }
 
 @Field static final Boolean debug = false
 @Field static final Integer MAX_PING_MILISECONDS = 10000     // rtt more than 10 seconds will be ignored
