@@ -44,6 +44,7 @@
  *  Ver. 0.6.0  2024-01-14 kkossev - Groovy lint; TS0004 _TZ3000_a37eix1s fingerprint correction @Rafael;
  *  Ver. 0.6.1  2024-01-29 kkossev - added TS011F _TZ3000_pmz6mjyu @g.machado
  *  Ver. 0.7.0  2024-02-29 kkossev - (dev. branch) more Groovy lint; E000_D003 exception processing; ignored duplicated on/off events for the parent device; added ping() and rtt measurement;
+ *  Ver. 0.7.1  2024-02-29 kkossev - (dev. branch) added TS0002 _TZ3000_ruldv5dt MCHOZY 2 channel relay;
  *
  *                                   TODO: add LIDL  // https://github.com/Koenkk/zigbee-herdsman-converters/blob/38bf79304292c380dc8366966aaefb71ca0b03da/src/devices/lidl.ts#L342     // https://community.hubitat.com/t/release-lidl-smart-home-drivers-with-device-health-status/86444/15?u=kkossev
  *                                   TODO: check a possible problem w/ initialize() : https://community.hubitat.com/t/driver-needed-for-moes-3-gang-smart-switch-module-ms-104cz/116449/15?u=kkossev
@@ -102,6 +103,7 @@ metadata {
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0002', manufacturer: '_TZ3000_tqlv4ug4', deviceJoinName: 'GIRIER Tuya ZigBee 3.0 Light Switch Module'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,0702,0B04,E000,E001,0000', outClusters: '0019,000A', model: 'TS0002', manufacturer: '_TZ3000_zmy4lslw', deviceJoinName: 'Tuya Zigbee Switch Multi-Gang'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0006,0003,0004,0005,E001', outClusters: '0019,000A', model: 'TS0002', manufacturer: '_TZ3000_5gey1ohx', deviceJoinName: 'Tuya Zigbee Switch Multi-Gang'     //https://community.hubitat.com/t/mbg-line-tuya-2ch-ln/115309?u=kkossev
+        fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0002', manufacturer: '_TZ3000_ruldv5dt', deviceJoinName: 'MCHOZY 2 channel' // https://community.hubitat.com/t/little-help-with-a-mhcozy-2-channel-5v-12v-zigbee-smart-relay/135423?u=kkossev
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,000A,0004,0005,0006', outClusters: '0019', model: 'TS0003', manufacturer: '_TYZB01_pdevogdj', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,000A,0004,0005,0006', outClusters: '0019', model: 'TS0003', manufacturer: '_TZ3000_pdevogdj', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006', outClusters: '0019', model: 'TS0003', manufacturer: '_TZ3000_odzoiovu', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'
