@@ -44,8 +44,9 @@
  *  Ver. 0.6.0  2024-01-14 kkossev - Groovy lint; TS0004 _TZ3000_a37eix1s fingerprint correction @Rafael;
  *  Ver. 0.6.1  2024-01-29 kkossev - added TS011F _TZ3000_pmz6mjyu @g.machado
  *  Ver. 0.7.0  2024-02-29 kkossev - more Groovy lint; E000_D003 exception processing; ignored duplicated on/off events for the parent device; added ping() and rtt measurement;
- *  Ver. 0.7.1  2024-05-01 kkossev - (dev. branch) added TS0002 _TZ3000_ruldv5dt MCHOZY 2 channel relay; TS0011 _TZ3000_syoxtjf0
- *
+ *  Ver. 0.7.1  2024-05-01 kkossev - added TS0002 _TZ3000_ruldv5dt MCHOZY 2 channel relay; TS0011 _TZ3000_syoxtjf0
+ *  Ver. 1.0.0  2024-05-01 kkossev - first version pushed to HPM
+ *  Ver. 1.0.1  2024-05-01 kkossev - added TS0726 _TZ3000_kt6xxa4o
  *                                   TODO: add LIDL  // https://github.com/Koenkk/zigbee-herdsman-converters/blob/38bf79304292c380dc8366966aaefb71ca0b03da/src/devices/lidl.ts#L342     // https://community.hubitat.com/t/release-lidl-smart-home-drivers-with-device-health-status/86444/15?u=kkossev
  *                                   TODO: check a possible problem w/ initialize() : https://community.hubitat.com/t/driver-needed-for-moes-3-gang-smart-switch-module-ms-104cz/116449/15?u=kkossev
  *                                   TODO: automatic logsOff()
@@ -60,8 +61,8 @@ import groovy.transform.Field
 import com.hubitat.app.DeviceWrapper
 import com.hubitat.app.ChildDeviceWrapper
 
-static String version() { '0.7.1' }
-static String timeStamp() { '2024/05/01 9:49 AM' }
+static String version() { '1.0.1' }
+static String timeStamp() { '2024/05/01 8:24 PM' }
 
 @Field static final Boolean debug = false
 @Field static final Integer MAX_PING_MILISECONDS = 10000     // rtt more than 10 seconds will be ignored
@@ -173,7 +174,6 @@ metadata {
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006', outClusters:'0019,000A', model:'TS011F', manufacturer:'_TZ3000_1obwwnmq', deviceJoinName: 'Silvercrest 3 gang switch, with 4 USB'
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006', outClusters:'0019,000A', model:'TS011F', manufacturer:'_TZ3000_oznonj5q', deviceJoinName: 'Silvercrest 3 gang switch, with 4 USB'
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006', outClusters:'0019,000A', model:'TS011F', manufacturer:'_TZ3000_wzauvbcs', deviceJoinName: 'Silvercrest 3 gang switch, with 4 USB (EU)'
-        //
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,000A,0004,0005,0006', outClusters: '0019', model: 'TS0115', manufacturer: '_TYZB01_vkwryfdr', deviceJoinName: 'UseeLink Power Strip'                       //https://community.hubitat.com/t/another-brick-in-the-wall-tuya-joins-the-zigbee-alliance/44152/28?u=kkossev
         // SiHAS Switch (2~6 Gang)
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0006,0019', outClusters: '0003,0004,0019', manufacturer: 'ShinaSystem', model: 'SBM300Z2', deviceJoinName: 'SiHAS Switch 2-gang'
@@ -182,10 +182,11 @@ metadata {
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0006,0019', outClusters: '0003,0004,0019', manufacturer: 'ShinaSystem', model: 'SBM300Z5', deviceJoinName: 'SiHAS Switch 5-gang'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0006,0019', outClusters: '0003,0004,0019', manufacturer: 'ShinaSystem', model: 'SBM300Z6', deviceJoinName: 'SiHAS Switch 6-gang'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0006,0019', outClusters: '0003,0004,0019', manufacturer: 'ShinaSystem', model: 'ISM300Z3', deviceJoinName: 'SiHAS Switch 3-gang'
-        // NodOn
+        // NodOn // https://nodon.pro/en/produits/zigbee-pro-on-off-lighting-relay-switch/
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006,0007,0008,1000,FC57', outClusters: '0003,0006,0019', manufacturer: 'NodOn', model: 'SIN-4-2-20', deviceJoinName: 'NodOn Light 2 channels'
-        // https://nodon.pro/en/produits/zigbee-pro-on-off-lighting-relay-switch/
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006,0007,0008,1000,FC57', outClusters: '0003,0006,0019', manufacturer: 'NodOn', model: 'SIN-4-2-20_PRO', deviceJoinName: 'NodOn Light 2 channels'
+        // NEW! TS0726 switches + scene buttons
+        fingerprint profileId:"0104", endpointId:"01", inClusters:"0000,0003,0004,0005,0006,E000,E001", outClusters:"0019,000A", model:"TS0726", manufacturer:"_TZ3000_kt6xxa4o", deviceJoinName: "Brazil 3+3 Zigbee Switch"
 
         command 'powerOnState', [
                 [name: 'powerOnState', type: 'ENUM', constraints: ['--- Select ---', 'OFF', 'ON', 'Last state'], description: 'Select Power On State']
@@ -208,7 +209,7 @@ metadata {
     preferences {
         input(name: 'txtEnable', type: 'bool', title: 'Enable description text logging', defaultValue: true)
         input(name: 'logEnable', type: 'bool', title: 'Enable debug logging', defaultValue: true)
-        input(title: 'IMPORTANT', description: '<b>In order to operate normally, please pair the device to HE after changing to this driver!</b>', type: 'paragraph', element: 'paragraph')
+        input(title: 'IMPORTANT', description: '<b>If the device does not operate normally, please pair the device again to HE after changing to this driver!</b>', type: 'paragraph', element: 'paragraph')
     }
 }
 
@@ -241,7 +242,9 @@ void parse(String description) {
         parseAttributes(descMap)
         return
     }
-    else if (descMap?.clusterId == '0013' && descMap?.profileId != null && descMap?.profileId == '0000') {
+    else if (descMap?.profileId != null && descMap?.profileId == '0104' && descMap?.clusterId == '0006' && descMap?.command == 'FD') {
+        parseTS0726(descMap)
+    } else if (descMap?.clusterId == '0013' && descMap?.profileId != null && descMap?.profileId == '0000') {
         logInfo "device model ${device.data.model}, manufacturer ${device.data.manufacturer} <b>re-joined the network</b> (deviceNetworkId ${device.properties.deviceNetworkId}, zigbeeId ${device.properties.zigbeeId})"
     } else if (descMap?.clusterId == '0006' && descMap?.profileId != null && descMap?.profileId == '0000') {
         logInfo "Match Descriptor Request (deviceNetworkId ${device.properties.deviceNetworkId}, zigbeeId ${device.properties.zigbeeId})"
@@ -466,22 +469,32 @@ void processOnOff(final Map it, final Map descMap) {
         }
     }
     String switchAttribute = descMap.value == '01' ? 'on' : 'off'
+    String descriptionText = ''
     if (cd != null) {
         if (descMap.command in ['0A', '0B']) {
             // switch toggled
-            cd.parse([[name: 'switch', value: switchAttribute, descriptionText: "Child switch ${descMap.endpoint} turned $switchAttribute"]])
+            // TS0726 is sendding duplicate messages... : ( - ignore them
+            if (cd.currentValue('switch') == switchAttribute) {
+                logDebug "switch ${descMap.endpoint}} is already in the requested state ${switchAttribute}"
+                return
+            }
+            descriptionText = "Child switch ${descMap.endpoint} turned ${switchAttribute}"
+            cd.parse([[name: 'switch', value: switchAttribute, descriptionText: descriptionText]])
+            logInfo "${descriptionText}"
         } else if (descMap.command == '01') {
             // report switch status
-            cd.parse([[name: 'switch', value: switchAttribute, descriptionText: "Child switch  ${descMap.endpoint} is $switchAttribute"]])
+            descriptionText = "Child switch ${descMap.endpoint} is ${switchAttribute}"
+            cd.parse([[name: 'switch', value: switchAttribute, descriptionText: descriptionText]])
+            logInfo "${descriptionText}"
         }
     }
     if (switchAttribute == 'on') {
         if (device.currentValue('switch') == 'on') {
-            logDebug 'switch is already on'
+            logDebug 'Parent switch is already on'
             return
         }
         sendEvent(name: 'switch', value: 'on')
-        logInfo 'switch is on'
+        logInfo 'Parent switch is on'
         return
     } else if (switchAttribute == 'off') {
         int cdsOn = 0
@@ -493,13 +506,29 @@ void processOnOff(final Map it, final Map descMap) {
         }
         if (cdsOn == 0) {
             if (device.currentValue('switch') == 'off') {
-                logDebug 'switch is already off'
+                logDebug 'Parent switch is already off'
                 return
             }
             sendEvent(name: 'switch', value: 'off')
-            logInfo 'switch is off'
+            logInfo 'Parent switch is off'
             return
         }
+    }
+}
+
+void parseTS0726(final Map descMap) {
+    //log.trace "parseTS0726 : sourceEndpoint=${descMap?.sourceEndpoint}"
+    ChildDeviceWrapper cd = getChildDevice("${device.id}-${descMap.sourceEndpoint}")
+    //log.trace "parseTS0726 : cd=${cd}"
+    if (cd != null) {
+        // toggle the virtual switch
+        String switchAttribute = cd.currentValue('switch') == 'on' ? 'off' : 'on'
+        String descriptionText = "Scene switch  ${descMap.sourceEndpoint} is ${switchAttribute}"
+        cd.parse([[name: 'switch', value: switchAttribute, descriptionText: descriptionText]])
+        logInfo "${descriptionText}"
+    }
+    else {
+        logWarn "Child device ${device.id}-${descMap.sourceEndpoint} not found. Initialise parent device first"
     }
 }
 
@@ -545,7 +574,8 @@ void componentRefresh(DeviceWrapper childDevice) {
 void setupChildDevices() {
     logDebug 'Parent setupChildDevices'
     deleteObsoleteChildren()
-    Integer buttons = 0
+    int buttons = 0
+    int gangs = 0
     switch (device.data.model) {
         case 'SBM300Z6':
             buttons = 6
@@ -563,6 +593,9 @@ void setupChildDevices() {
             else {
                 buttons = 5
             }
+            break
+        case 'TS0726':  // Brazil 3+3 Zigbee Switch
+            buttons = 6
             break
         case 'TS0115':
         case 'SBM300Z5':
@@ -593,7 +626,9 @@ void setupChildDevices() {
         default:
             break
     }
-    logInfo "model: ${device.data.model} gangs:${buttons == 0 ? 1 : buttons} child devices: ${buttons}"
+    gangs = buttons == 0 ? 1 : buttons
+    state.gangs = gangs
+    logInfo "model: ${device.data.model} gangs:${gangs} child devices: ${buttons}"
     createChildDevices((int) buttons)
 }
 
