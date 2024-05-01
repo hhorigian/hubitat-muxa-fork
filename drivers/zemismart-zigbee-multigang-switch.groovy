@@ -43,8 +43,8 @@
  *  Ver. 0.5.4  2023-10-29 kkossev - added TS0002 _TZ3000_qcgw8qfa
  *  Ver. 0.6.0  2024-01-14 kkossev - Groovy lint; TS0004 _TZ3000_a37eix1s fingerprint correction @Rafael;
  *  Ver. 0.6.1  2024-01-29 kkossev - added TS011F _TZ3000_pmz6mjyu @g.machado
- *  Ver. 0.7.0  2024-02-29 kkossev - (dev. branch) more Groovy lint; E000_D003 exception processing; ignored duplicated on/off events for the parent device; added ping() and rtt measurement;
- *  Ver. 0.7.1  2024-03-20 kkossev - (dev. branch) added TS0002 _TZ3000_ruldv5dt MCHOZY 2 channel relay;
+ *  Ver. 0.7.0  2024-02-29 kkossev - more Groovy lint; E000_D003 exception processing; ignored duplicated on/off events for the parent device; added ping() and rtt measurement;
+ *  Ver. 0.7.1  2024-05-01 kkossev - (dev. branch) added TS0002 _TZ3000_ruldv5dt MCHOZY 2 channel relay; TS0011 _TZ3000_syoxtjf0
  *
  *                                   TODO: add LIDL  // https://github.com/Koenkk/zigbee-herdsman-converters/blob/38bf79304292c380dc8366966aaefb71ca0b03da/src/devices/lidl.ts#L342     // https://community.hubitat.com/t/release-lidl-smart-home-drivers-with-device-health-status/86444/15?u=kkossev
  *                                   TODO: check a possible problem w/ initialize() : https://community.hubitat.com/t/driver-needed-for-moes-3-gang-smart-switch-module-ms-104cz/116449/15?u=kkossev
@@ -61,7 +61,7 @@ import com.hubitat.app.DeviceWrapper
 import com.hubitat.app.ChildDeviceWrapper
 
 static String version() { '0.7.1' }
-static String timeStamp() { '2024/03/20 7:10 AM' }
+static String timeStamp() { '2024/05/01 9:49 AM' }
 
 @Field static final Boolean debug = false
 @Field static final Integer MAX_PING_MILISECONDS = 10000     // rtt more than 10 seconds will be ignored
@@ -132,6 +132,7 @@ metadata {
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,0000', outClusters: '0019,000A', model: 'TS0011', manufacturer: '_TZ3000_hhiodade', deviceJoinName: 'Moes ZTS-EU_1gang'                    // https://community.hubitat.com/t/uk-moes-zigbee-1-2-3-or-4-gang-light-switch/89747/5?u=kkossev
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0011', manufacturer: '_TZ3000_ji4araar', deviceJoinName: 'Tuya 1 gang switch'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,0000', outClusters: '0019,000A', model: 'TS0011', manufacturer: '_TZ3000_9hpxg80k', deviceJoinName: 'Tuya 1 gang'                          // https://github.com/zigpy/zha-device-handlers/issues/535
+        fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,0000', outClusters: '0019,000A', model: 'TS0011', manufacturer: '_TZ3000_syoxtjf0', deviceJoinName: 'Tuya 1 gang'                          // https://community.hubitat.com/t/drivers-for-martin-jerry-zigbee-zigbee-smart-switch-us-zb-ss01/119248/18?u=kkossev
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0001,0007,0000,0003,0004,0005,0006,E000,E001,0002', outClusters: '0019,000A', model: 'TS0012', manufacturer: '_TZ3000_k008kbls', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'        // check!
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006', outClusters: '0019', model: 'TS0012', manufacturer: '_TZ3000_uz5xzdgy', deviceJoinName: 'Zemismart Zigbee Switch No Neutral'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0004,0005,0006', outClusters: '0019,000A', model: 'TS0012', manufacturer: '_TZ3000_fvh3pjaz', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'
