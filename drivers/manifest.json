@@ -1,6 +1,6 @@
 {
  "packageName":"Zemismart ZigBee Wall Switch Multi-Gang",
- "author":"Muxa",
+ "author":"Muxa, kkossev",
  "version":"1.0.0",
  "minimumHEVersion":"2.3.7.100",
  "dateReleased":"2024-05-01",
@@ -11,6 +11,7 @@
   {
      "id":"cee0de03-7068-4e9b-92a3-9d522d28846b",
      "name":"Zemismart ZigBee Wall Switch Multi-Gang",
+	 "namespace": "muxa",
      "location":"https://raw.githubusercontent.com/kkossev/hubitat-muxa-fork/master/drivers/zemismart-zigbee-multigang-switch.groovy",
      "required":true
   }
