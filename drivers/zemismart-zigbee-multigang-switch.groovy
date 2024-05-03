@@ -65,7 +65,7 @@ import com.hubitat.app.DeviceWrapper
 import com.hubitat.app.ChildDeviceWrapper
 
 static String version() { '1.1.0' }
-static String timeStamp() { '2024/05/02 9:22 AM' }
+static String timeStamp() { '2024/05/02 3:50 PM' }
 
 @Field static final Boolean debug = false
 @Field static final Integer MAX_PING_MILISECONDS = 10000     // rtt more than 10 seconds will be ignored
