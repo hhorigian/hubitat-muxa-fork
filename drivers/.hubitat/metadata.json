@@ -1,3 +1,10 @@
 {
-  "files": []
+  "files": [
+    {
+      "filepath": "/c:/Work/hubitat-muxa-fork/drivers/zemismart-zigbee-multigang-switch.groovy",
+      "id": 1220,
+      "codeType": "driver",
+      "version": 341
+    }
+  ]
 }

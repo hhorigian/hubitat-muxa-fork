@@ -47,6 +47,7 @@
  *  Ver. 0.7.1  2024-05-01 kkossev - added TS0002 _TZ3000_ruldv5dt MCHOZY 2 channel relay; TS0011 _TZ3000_syoxtjf0
  *  Ver. 1.0.0  2024-05-01 kkossev - first version pushed to HPM
  *  Ver. 1.1.0  2024-05-02 kkossev - added TS0726 _TZ3000_kt6xxa4o; added switchBacklight command; added TS0001 _TZ3000_ovyaisip; TS0001 _TZ3000_4rbqgcuv; TS0002 _TZ3000_kgxej1dv; TS0003 _TZ3000_qxcnwv26;
+ *  Ver. 1.1.1  2024-05-03 kkossev - (dev. branch) added more TS0726 fingerprints; added TS1002 _TZ3000_xa9g7rxs (a weird device!);
  *
  *                                   TODO: add toggle() command
  *                                   TODO: refresh all known attributes for TS0726
@@ -64,8 +65,8 @@ import groovy.transform.Field
 import com.hubitat.app.DeviceWrapper
 import com.hubitat.app.ChildDeviceWrapper
 
-static String version() { '1.1.0' }
-static String timeStamp() { '2024/05/02 3:50 PM' }
+static String version() { '1.1.1' }
+static String timeStamp() { '2024/05/02 9:39 PM' }
 
 @Field static final Boolean debug = false
 @Field static final Integer MAX_PING_MILISECONDS = 10000     // rtt more than 10 seconds will be ignored
@@ -221,6 +222,22 @@ metadata {
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006,0007,0008,1000,FC57', outClusters: '0003,0006,0019', manufacturer: 'NodOn', model: 'SIN-4-2-20_PRO', deviceJoinName: 'NodOn Light 2 channels'
         // NEW! TS0726 switches + scene buttons
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,E000,E001', outClusters:'0019,000A', model:'TS0726', manufacturer:'_TZ3000_kt6xxa4o', deviceJoinName: 'Brazil 3+3 Zigbee Switch'
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,E000,E001', outClusters:'0019,000A', model:'TS0726', manufacturer:'_TZ3000_dfl9kueg', deviceJoinName: 'TS0726 switches/scenes'      // not tested
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,E000,E001', outClusters:'0019,000A', model:'TS0726', manufacturer:'_TZ3002_ml1agdim', deviceJoinName: 'TS0726 switches/scenes'      // not tested
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,E000,E001', outClusters:'0019,000A', model:'TS0726', manufacturer:'_TZ3000_wsspgtcd', deviceJoinName: 'TS0726 switches/scenes'      // not tested
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,E000,E001', outClusters:'0019,000A', model:'TS0726', manufacturer:'_TZ3000_fcx5d58u', deviceJoinName: 'TS0726 switches/scenes'      // not tested
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,E000,E001', outClusters:'0019,000A', model:'TS0726', manufacturer:'_TZ3000_a9buwvb7', deviceJoinName: 'TS0726 switches/scenes'      // not tested
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,E000,E001', outClusters:'0019,000A', model:'TS0726', manufacturer:'_TZ3000_s678wazd', deviceJoinName: 'TS0726 switches/scenes'      // not tested
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,E000,E001', outClusters:'0019,000A', model:'TS0726', manufacturer:'_TZ3000_qhyadm57', deviceJoinName: 'TS0726 switches/scenes'      // not tested
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,E000,E001', outClusters:'0019,000A', model:'TS0726', manufacturer:'_TZ3002_ymcctknk', deviceJoinName: 'TS0726 switches/scenes'      // not tested
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,E000,E001', outClusters:'0019,000A', model:'TS0726', manufacturer:'_TZE200_fm5yck8a', deviceJoinName: 'TS0726 switches/scenes'      // not tested
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,E000,E001', outClusters:'0019,000A', model:'TS0726', manufacturer:'_TZ3002_cipzj0xu', deviceJoinName: 'TS0726 switches/scenes'      // not tested
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,E000,E001', outClusters:'0019,000A', model:'TS0726', manufacturer:'_TZ3002_gdwja9a7', deviceJoinName: 'TS0726 switches/scenes'      // not tested
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,E000,E001', outClusters:'0019,000A', model:'TS0726', manufacturer:'_TZ3002_e6r353tf', deviceJoinName: 'TS0726 switches/scenes'      // not tested
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,E000,E001', outClusters:'0019,000A', model:'TS0726', manufacturer:'_TZ3002_phu8ygaw', deviceJoinName: 'TS0726 switches/scenes'      // not tested
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,E000,E001', outClusters:'0019,000A', model:'TS0726', manufacturer:'_TZ3002_sal078g8', deviceJoinName: 'TS0726 switches/scenes'      // not tested
+        //
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0004,1000,E001', outClusters:'0019,000A,0003,0004,0005,0006,0008,0300,1000', model:'TS1002', manufacturer:'_TZ3000_xa9g7rxs', deviceJoinName: 'Tuya TS1002 switch'
     }
     preferences {
         input(name: 'txtEnable', type: 'bool', title: 'Enable description text logging', defaultValue: true)
@@ -264,7 +281,7 @@ void parse(String description) {
         return
     }
     else if (descMap?.profileId != null && descMap?.profileId == '0104' && descMap?.clusterId == '0006' && descMap?.command == 'FD') {
-        parseTS0726(descMap)
+        parseCommandFD(descMap)
     } else if (descMap?.clusterId == '0013' && descMap?.profileId != null && descMap?.profileId == '0000') {
         logInfo "device model ${device.data.model}, manufacturer ${device.data.manufacturer} <b>re-joined the network</b> (deviceNetworkId ${device.properties.deviceNetworkId}, zigbeeId ${device.properties.zigbeeId})"
     } else if (descMap?.clusterId == '0006' && descMap?.profileId != null && descMap?.profileId == '0000') {
@@ -537,10 +554,39 @@ void processOnOff(final Map it, final Map descMap) {
     }
 }
 
+void parseCommandFD(final Map descMap) {
+    if (device.data.model in ['TS0726']) {
+        parseTS0726(descMap)
+    }
+    else if (device.data.model in ['TS1002']) {
+        parseTS1002(descMap)
+    }
+    else {
+        logWarn "parseCommandFD: not processed for model ${device.data.model}"
+    }
+}
+
+void parseTS1002(final Map descMap) {
+    if (descMap?.data?.size() != 3) {
+        logWarn "parseTS1002: unexpected data size ${descMap?.data?.size()}"
+        return
+    }
+    String strButton = descMap.data[2]
+    ChildDeviceWrapper cd = getChildDevice("${device.id}-${strButton}")
+    if (cd != null) {
+        // toggle the virtual switch
+        String switchAttribute = cd.currentValue('switch') == 'on' ? 'off' : 'on'
+        String descriptionText = "Scene switch  ${strButton} is ${switchAttribute}"
+        cd.parse([[name: 'switch', value: switchAttribute, descriptionText: descriptionText]])
+        logInfo "${descriptionText}"
+    }
+    else {
+        if (settings?.txtEnable) { log.warn "parseTS1002: Child device ${device.id}-${strButton} not found. Click on the parent device 'Initialize' button, first selecting 'Yes' in the drop-down options list below" }
+    }
+}
+
 void parseTS0726(final Map descMap) {
-    //log.trace "parseTS0726 : sourceEndpoint=${descMap?.sourceEndpoint}"
     ChildDeviceWrapper cd = getChildDevice("${device.id}-${descMap.sourceEndpoint}")
-    //log.trace "parseTS0726 : cd=${cd}"
     if (cd != null) {
         // toggle the virtual switch
         String switchAttribute = cd.currentValue('switch') == 'on' ? 'off' : 'on'
@@ -610,6 +656,9 @@ void setupChildDevices() {
     int buttons = 0
     int gangs = 0
     switch (device.data.model) {
+        case 'TS1002':
+            buttons = 8
+            break
         case 'SBM300Z6':
             buttons = 6
             break

@@ -14,3 +14,4 @@ apps/apps.iml
 .idea/.gitignore
 hubitat-muxa-fork.iml
 >>>>>>> development
+drivers/ScratchPad.txt
