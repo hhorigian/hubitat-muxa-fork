@@ -46,7 +46,10 @@
  *  Ver. 0.7.0  2024-02-29 kkossev - more Groovy lint; E000_D003 exception processing; ignored duplicated on/off events for the parent device; added ping() and rtt measurement;
  *  Ver. 0.7.1  2024-05-01 kkossev - added TS0002 _TZ3000_ruldv5dt MCHOZY 2 channel relay; TS0011 _TZ3000_syoxtjf0
  *  Ver. 1.0.0  2024-05-01 kkossev - first version pushed to HPM
+ *  Ver. 1.1.0  2024-05-02 kkossev - added TS0726 _TZ3000_kt6xxa4o; added switchBacklight command; added TS0001 _TZ3000_ovyaisip; TS0001 _TZ3000_4rbqgcuv; TS0002 _TZ3000_kgxej1dv; TS0003 _TZ3000_qxcnwv26;
  *
+ *                                   TODO: add toggle() command
+ *                                   TODO: refresh all known attributes for TS0726
  *                                   TODO: add LIDL  // https://github.com/Koenkk/zigbee-herdsman-converters/blob/38bf79304292c380dc8366966aaefb71ca0b03da/src/devices/lidl.ts#L342     // https://community.hubitat.com/t/release-lidl-smart-home-drivers-with-device-health-status/86444/15?u=kkossev
  *                                   TODO: check a possible problem w/ initialize() : https://community.hubitat.com/t/driver-needed-for-moes-3-gang-smart-switch-module-ms-104cz/116449/15?u=kkossev
  *                                   TODO: automatic logsOff()
@@ -60,8 +63,8 @@ import groovy.transform.Field
 import com.hubitat.app.DeviceWrapper
 import com.hubitat.app.ChildDeviceWrapper
 
-static String version() { '1.0.0' }
-static String timeStamp() { '2024/05/01 11:00 AM' }
+static String version() { '1.1.0' }
+static String timeStamp() { '2024/05/02 3:50 PM' }
 
 @Field static final Boolean debug = false
 @Field static final Integer MAX_PING_MILISECONDS = 10000     // rtt more than 10 seconds will be ignored
@@ -75,6 +78,33 @@ metadata {
         capability 'Switch'
         capability 'Health Check'
 
+        command 'powerOnState', [
+                [name: 'selecy powerOnState and click on the button above', type: 'ENUM', constraints: ['--- Select ---', 'off', 'on', 'last state'], description: 'Select Power On State']
+        ]
+        command 'switchType', [
+                [name: 'select switchType and click on the button above', type: 'ENUM', constraints: ['--- Select ---', 'toggle', 'state', 'momentary'], description: 'Select Switch Type']     // 0: 'toggle', 1: 'state', 2: 'momentary'
+        ]
+        command 'ledMode', [
+                [name: 'select ledMode and click on the button above', type: 'ENUM', constraints: ['--- Select ---', 'disabled', 'lit when on', 'lit when off'], description: 'Select LED Mode']
+        ]
+        command 'switchBacklight', [
+                [name: 'select switchBacklight and click on the button above', type: 'ENUM', constraints: ['--- Select ---', 'off', 'on'], description: 'Select Switch Backlight']
+        ]
+        command 'initialize', [
+                [name: "Select 'Yes' and click on the button above", type: 'ENUM', description: 're-creates the child devices!', constraints: ['--- Select ---', 'Yes', 'No']]
+        ]
+
+        if (debug == true) {
+            command 'test', ['string']
+        }
+
+        //attribute 'lastCheckin', 'string'
+        attribute 'rtt', 'number'
+        attribute 'powerOnState', 'string'
+        attribute 'switchType', 'string'
+        attribute 'ledMode', 'string'
+        attribute 'switchBacklight', 'string'
+
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0001', manufacturer: '_TZ3000_npzfdcof', deviceJoinName: 'Tuya Zigbee Switch'            // https://www.aliexpress.com/item/1005002852788275.html
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0001', manufacturer: '_TZ3000_hktqahrq', deviceJoinName: 'Tuya Zigbee Switch'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0001', manufacturer: '_TZ3000_mx3vgyea', deviceJoinName: 'Tuya Zigbee Switch'
@@ -85,7 +115,9 @@ metadata {
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS000F', manufacturer: '_TZ3000_m9af2l6g', deviceJoinName: 'Tuya Zigbee Switch'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0001', manufacturer: '_TZ3000_oex7egmt', deviceJoinName: 'Tuya 1 gang Zigbee switch MYQ-KLS01L'        //https://expo.tuya.com/product/601097
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0001', manufacturer: '_TZ3000_tqlv4ug4', deviceJoinName: 'GIRIER Tuya ZigBee 3.0 Light Switch Module'  //https://community.hubitat.com/t/girier-tuya-zigbee-3-0-light-switch-module-smart-diy-breaker-1-2-3-4-gang-supports-2-way-control/104546
-        fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006', outClusters: '0019', model: 'TS0001', manufacturer: '_TZ3000_agpdnnyd', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'
+        fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006', outClusters: '0019', model: 'TS0001', manufacturer: '_TZ3000_agpdnnyd', deviceJoinName: 'Tuya Zigbee Switch'
+        fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0001', manufacturer:'_TZ3000_ovyaisip', deviceJoinName:'Tuya Zigbee Switch'
+        fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,0702,0B04,E000,E001,0000', outClusters: '0019,000A', model: 'TS0001', manufacturer:'_TZ3000_4rbqgcuv', deviceJoinName:'Tuya Zigbee Switch'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006', outClusters: '0019', model: 'TS0002', manufacturer: 'Zemismart', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,000A,0004,0005,0006', outClusters: '0019', model: 'TS0002', manufacturer: '_TZ3000_tas0zemd', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006', outClusters: '0003,0006,0019', model: 'TS0002', manufacturer: '_TZ3000_qcgw8qfa', deviceJoinName: 'Zemismart 2 gang smart switch'
@@ -103,6 +135,7 @@ metadata {
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,0702,0B04,E000,E001,0000', outClusters: '0019,000A', model: 'TS0002', manufacturer: '_TZ3000_zmy4lslw', deviceJoinName: 'Tuya Zigbee Switch Multi-Gang'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0006,0003,0004,0005,E001', outClusters: '0019,000A', model: 'TS0002', manufacturer: '_TZ3000_5gey1ohx', deviceJoinName: 'Tuya Zigbee Switch Multi-Gang'     //https://community.hubitat.com/t/mbg-line-tuya-2ch-ln/115309?u=kkossev
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0002', manufacturer: '_TZ3000_ruldv5dt', deviceJoinName: 'MCHOZY 2 channel' // https://community.hubitat.com/t/little-help-with-a-mhcozy-2-channel-5v-12v-zigbee-smart-relay/135423?u=kkossev
+        fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0002', manufacturer: '_TZ3000_kgxej1dv', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,000A,0004,0005,0006', outClusters: '0019', model: 'TS0003', manufacturer: '_TYZB01_pdevogdj', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,000A,0004,0005,0006', outClusters: '0019', model: 'TS0003', manufacturer: '_TZ3000_pdevogdj', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006', outClusters: '0019', model: 'TS0003', manufacturer: '_TZ3000_odzoiovu', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'
@@ -117,6 +150,7 @@ metadata {
         fingerprint profileId: '0104', endpointId: '01', inClusters: '2101,0000', outClusters: '0021', model: 'TS0003', manufacturer: '_TZ3000_udtmrasg', deviceJoinName: 'Tuya 3-gang Switch'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0003', manufacturer: '_TZ3000_iwhuhzdo', deviceJoinName: 'Zemismart ZL-LU03'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,0702,0B04,E000,E001,0000', outClusters: '0019,000A', model: 'TS0003', manufacturer: '_TZ3000_pfc7i3kt', deviceJoinName: 'MOES Tuya Zigebee Module'    // https://community.hubitat.com/t/driver-needed-for-moes-3-gang-smart-switch-module-ms-104cz/116449?u=kkossev
+        fingerprint profileId: '0104', endpointId: '01', inClusters: '0003,0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS0003', manufacturer:'_TZ3000_qxcnwv26', deviceJoinName:'Tuya Zigbee Switch Multi-Gang'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006', outClusters: '0019', model: 'TS0004', manufacturer: '_TZ3000_ltt60asa', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'        // check!
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006', outClusters: '0019', model: 'TS0004', manufacturer: '_TZ3000_excgg5kb', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'        // check!
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006,E000,E001', outClusters: '0019,000A', model: 'TS0004', manufacturer: '_TZ3000_a37eix1s', deviceJoinName: 'Zemismart Zigbee Switch Multi-Gang'        // @Rafael
@@ -172,7 +206,6 @@ metadata {
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006', outClusters:'0019,000A', model:'TS011F', manufacturer:'_TZ3000_1obwwnmq', deviceJoinName: 'Silvercrest 3 gang switch, with 4 USB'
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006', outClusters:'0019,000A', model:'TS011F', manufacturer:'_TZ3000_oznonj5q', deviceJoinName: 'Silvercrest 3 gang switch, with 4 USB'
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006', outClusters:'0019,000A', model:'TS011F', manufacturer:'_TZ3000_wzauvbcs', deviceJoinName: 'Silvercrest 3 gang switch, with 4 USB (EU)'
-        //
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,000A,0004,0005,0006', outClusters: '0019', model: 'TS0115', manufacturer: '_TYZB01_vkwryfdr', deviceJoinName: 'UseeLink Power Strip'                       //https://community.hubitat.com/t/another-brick-in-the-wall-tuya-joins-the-zigbee-alliance/44152/28?u=kkossev
         // SiHAS Switch (2~6 Gang)
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0006,0019', outClusters: '0003,0004,0019', manufacturer: 'ShinaSystem', model: 'SBM300Z2', deviceJoinName: 'SiHAS Switch 2-gang'
@@ -181,35 +214,23 @@ metadata {
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0006,0019', outClusters: '0003,0004,0019', manufacturer: 'ShinaSystem', model: 'SBM300Z5', deviceJoinName: 'SiHAS Switch 5-gang'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0006,0019', outClusters: '0003,0004,0019', manufacturer: 'ShinaSystem', model: 'SBM300Z6', deviceJoinName: 'SiHAS Switch 6-gang'
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0006,0019', outClusters: '0003,0004,0019', manufacturer: 'ShinaSystem', model: 'ISM300Z3', deviceJoinName: 'SiHAS Switch 3-gang'
-        // NodOn
+        // NodOn // https://nodon.pro/en/produits/zigbee-pro-on-off-lighting-relay-switch/
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006,0007,0008,1000,FC57', outClusters: '0003,0006,0019', manufacturer: 'NodOn', model: 'SIN-4-2-20', deviceJoinName: 'NodOn Light 2 channels'
-        // https://nodon.pro/en/produits/zigbee-pro-on-off-lighting-relay-switch/
         fingerprint profileId: '0104', endpointId: '01', inClusters: '0000,0003,0004,0005,0006,0007,0008,1000,FC57', outClusters: '0003,0006,0019', manufacturer: 'NodOn', model: 'SIN-4-2-20_PRO', deviceJoinName: 'NodOn Light 2 channels'
-
-        command 'powerOnState', [
-                [name: 'powerOnState', type: 'ENUM', constraints: ['--- Select ---', 'OFF', 'ON', 'Last state'], description: 'Select Power On State']
-        ]
-        command 'switchType', [
-                [name: 'switchType', type: 'ENUM', constraints: ['--- Select ---', 'toggle', 'state', 'momentary'], description: 'Select Switch Type']     // 0: 'toggle', 1: 'state', 2: 'momentary'
-        ]
-        command 'ledMode', [
-                [name: 'ledMode', type: 'ENUM', constraints: ['--- Select ---', 'Disabled', 'Lit when On', 'Lit when Off'], description: 'Select LED Mode']
-        ]
-        command 'initialize', [[name: "Select 'Yes' to re-initialize the device", type: 'ENUM', description: 're-creates the child devices!', constraints: ['--- Select ---', 'Yes', 'No']]]
-        if (debug == true) {
-            command 'test', ['string']
-        }
-
-        //attribute 'lastCheckin', 'string'
-        attribute 'rtt', 'number'
-
+        // NEW! TS0726 switches + scene buttons
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,E000,E001', outClusters:'0019,000A', model:'TS0726', manufacturer:'_TZ3000_kt6xxa4o', deviceJoinName: 'Brazil 3+3 Zigbee Switch'
     }
     preferences {
         input(name: 'txtEnable', type: 'bool', title: 'Enable description text logging', defaultValue: true)
         input(name: 'logEnable', type: 'bool', title: 'Enable debug logging', defaultValue: true)
-        input(title: 'IMPORTANT', description: '<b>In order to operate normally, please pair the device to HE after changing to this driver!</b>', type: 'paragraph', element: 'paragraph')
+        input(title: 'IMPORTANT', description: '<b>If the device does not operate normally, please pair the device again to HE after changing to this driver!</b>', type: 'paragraph', element: 'paragraph')
     }
 }
+
+@Field final Map<Integer, String> SwitchTypeMap = [0: 'toggle', 1: 'state', 2: 'momentary']
+@Field final Map<Integer, String> LedModeMap = [0: 'disabled', 1: 'lit when on', 2: 'lit when off']
+@Field final Map<Integer, String> PowerOnStateMap = [0: 'off', 1: 'on', 2: 'last state']
+@Field final Map<Integer, String> SwitchBacklightMap = [0: 'off', 1: 'on']
 
 /* groovylint-disable-next-line UnusedPrivateMethod */
 private boolean isHEProblematic() {
@@ -240,14 +261,16 @@ void parse(String description) {
         parseAttributes(descMap)
         return
     }
-    else if (descMap?.clusterId == '0013' && descMap?.profileId != null && descMap?.profileId == '0000') {
+    else if (descMap?.profileId != null && descMap?.profileId == '0104' && descMap?.clusterId == '0006' && descMap?.command == 'FD') {
+        parseTS0726(descMap)
+    } else if (descMap?.clusterId == '0013' && descMap?.profileId != null && descMap?.profileId == '0000') {
         logInfo "device model ${device.data.model}, manufacturer ${device.data.manufacturer} <b>re-joined the network</b> (deviceNetworkId ${device.properties.deviceNetworkId}, zigbeeId ${device.properties.zigbeeId})"
     } else if (descMap?.clusterId == '0006' && descMap?.profileId != null && descMap?.profileId == '0000') {
         logInfo "Match Descriptor Request (deviceNetworkId ${device.properties.deviceNetworkId}, zigbeeId ${device.properties.zigbeeId})"
     } else if (descMap?.clusterId == '8021' && descMap?.profileId != null && descMap?.profileId == '0000') {
         logInfo "Bind Response (deviceNetworkId ${device.properties.deviceNetworkId}, zigbeeId ${device.properties.zigbeeId})"
     } else if (descMap?.profileId != null && descMap?.command == '07') {
-        parseConfigureResponse(descMap) 
+        parseConfigureResponse(descMap)
     } else {
         logDebug "${device.displayName} unprocessed EP: ${descMap.sourceEndpoint} cluster: ${descMap.clusterId} command: ${descMap?.command} attrId: ${descMap.attrId}"
     }
@@ -332,7 +355,7 @@ void parseBasicClusterAttribute(final Map it) {
             Long now = new Date().getTime()
             boolean isPing = state.states['isPing'] ?: false
             if (isPing) {
-                def timeRunning = now.toInteger() - (state.lastTx['pingTime'] ?: '0').toInteger()
+                int timeRunning = now.toInteger() - (state.lastTx['pingTime'] ?: '0').toInteger()
                 if (timeRunning > 0 && timeRunning < MAX_PING_MILISECONDS) {
                     state.stats['pingsOK'] = (state.stats['pingsOK'] ?: 0) + 1
                     if (timeRunning < safeToInt((state.stats['pingsMin'] ?: '999'))) { state.stats['pingsMin'] = timeRunning }
@@ -386,7 +409,8 @@ void parseBasicClusterAttribute(final Map it) {
 }
 
 @Field static final int ROLLING_AVERAGE_N = 10
-BigDecimal approxRollingAverage(BigDecimal avg, BigDecimal newSample) {
+BigDecimal approxRollingAverage(BigDecimal avgPar, BigDecimal newSample) {
+    BigDecimal avg = avgPar
     if (avg == null || avg == 0) { avg = newSample }
     avg -= avg / ROLLING_AVERAGE_N
     avg += newSample / ROLLING_AVERAGE_N
@@ -400,11 +424,11 @@ BigDecimal approxRollingAverage(BigDecimal avg, BigDecimal newSample) {
  * @return none
  */
 void sendRttEvent( String value=null) {
-    def now = new Date().getTime()
+    long now = new Date().getTime()
     if (state.stats == null ) { state.stats = [:] }
     if (state.lastTx == null ) { state.lastTx = [:] }
-    def timeRunning = now.toInteger() - (state.lastTx['pingTime'] ?: now).toInteger()
-    def descriptionText = "Round-trip time is ${timeRunning} ms (min=${state.stats['pingsMin']} max=${state.stats['pingsMax']} average=${state.stats['pingsAvg']})"
+    int timeRunning = now.toInteger() - (state.lastTx['pingTime'] ?: now).toInteger()
+    String descriptionText = "Round-trip time is ${timeRunning} ms (min=${state.stats['pingsMin']} max=${state.stats['pingsMax']} average=${state.stats['pingsAvg']})"
     if (value == null) {
         logInfo "${descriptionText}"
         sendEvent(name: 'rtt', value: timeRunning, descriptionText: descriptionText, unit: 'ms', isDigital: true)
@@ -443,14 +467,13 @@ void parseConfigureResponse(final Map descMap) {
     // TODO - parse the details of the configuration respose - cluster, min, max, delta ...
     final String status = ((List)descMap.data).first()
     final int statusCode = hexStrToUnsignedInt(status)
-    final String statusName = statusCode == 0 ? "Success" : "0x${status}"
+    final String statusName = statusCode == 0 ? 'Success' : "0x${status}"
     if (statusCode > 0x00) {
         log.warn "zigbee configure reporting error: ${statusName} ${descMap.data}"
     } else {
         if (logEnable) { logInfo "zigbee configure reporting response: ${statusName} ${descMap.data}" }
     }
 }
-
 
 /* groovylint-disable-next-line UnusedMethodParameter */
 void processOnOff(final Map it, final Map descMap) {
@@ -465,22 +488,32 @@ void processOnOff(final Map it, final Map descMap) {
         }
     }
     String switchAttribute = descMap.value == '01' ? 'on' : 'off'
+    String descriptionText = ''
     if (cd != null) {
         if (descMap.command in ['0A', '0B']) {
             // switch toggled
-            cd.parse([[name: 'switch', value: switchAttribute, descriptionText: "Child switch ${descMap.endpoint} turned $switchAttribute"]])
+            // TS0726 is sendding duplicate messages... : ( - ignore them
+            if (cd.currentValue('switch') == switchAttribute) {
+                logDebug "switch ${descMap.endpoint} is already in the requested state ${switchAttribute}"
+                return
+            }
+            descriptionText = "Child switch ${descMap.endpoint} turned ${switchAttribute}"
+            cd.parse([[name: 'switch', value: switchAttribute, descriptionText: descriptionText]])
+            logInfo "${descriptionText}"
         } else if (descMap.command == '01') {
             // report switch status
-            cd.parse([[name: 'switch', value: switchAttribute, descriptionText: "Child switch  ${descMap.endpoint} is $switchAttribute"]])
+            descriptionText = "Child switch ${descMap.endpoint} is ${switchAttribute}"
+            cd.parse([[name: 'switch', value: switchAttribute, descriptionText: descriptionText]])
+            logInfo "${descriptionText}"
         }
     }
     if (switchAttribute == 'on') {
         if (device.currentValue('switch') == 'on') {
-            logDebug 'switch is already on'
+            logDebug 'Parent switch is already on'
             return
         }
         sendEvent(name: 'switch', value: 'on')
-        logInfo 'switch is on'
+        logInfo 'Parent switch is on'
         return
     } else if (switchAttribute == 'off') {
         int cdsOn = 0
@@ -492,13 +525,29 @@ void processOnOff(final Map it, final Map descMap) {
         }
         if (cdsOn == 0) {
             if (device.currentValue('switch') == 'off') {
-                logDebug 'switch is already off'
+                logDebug 'Parent switch is already off'
                 return
             }
             sendEvent(name: 'switch', value: 'off')
-            logInfo 'switch is off'
+            logInfo 'Parent switch is off'
             return
         }
+    }
+}
+
+void parseTS0726(final Map descMap) {
+    //log.trace "parseTS0726 : sourceEndpoint=${descMap?.sourceEndpoint}"
+    ChildDeviceWrapper cd = getChildDevice("${device.id}-${descMap.sourceEndpoint}")
+    //log.trace "parseTS0726 : cd=${cd}"
+    if (cd != null) {
+        // toggle the virtual switch
+        String switchAttribute = cd.currentValue('switch') == 'on' ? 'off' : 'on'
+        String descriptionText = "Scene switch  ${descMap.sourceEndpoint} is ${switchAttribute}"
+        cd.parse([[name: 'switch', value: switchAttribute, descriptionText: descriptionText]])
+        logInfo "${descriptionText}"
+    }
+    else {
+        if (settings?.txtEnable) { log.warn "Child device ${device.id}-${descMap.sourceEndpoint} not found. Click on the parent device 'Initialize' button, first selecting 'Yes' in the drop-down options list below" }
     }
 }
 
@@ -512,9 +561,21 @@ void on() {
     sendZigbeeCommands(["he cmd 0x${device.deviceNetworkId} 0xFF 0x0006 0x1 {}"])
 }
 
+void refreshTS0726() {
+    logDebug 'refreshing TS0726'
+    List<String> cmds = []
+    cmds  = zigbee.readAttribute(0x0006, [0x4001, 0x4002, 0x5000, 0x8001, 0x8002], [:], delay = 100)
+    cmds += zigbee.readAttribute(0xE000, [0xD004, 0xD005], [:], delay = 100)
+    cmds += zigbee.readAttribute(0xE001, [0xD010, 0xD020], [:], delay = 100)
+    sendZigbeeCommands(cmds)
+}
+
 void refresh() {
     logDebug 'refreshing'
     sendZigbeeCommands(["he rattr 0x${device.deviceNetworkId} 0xFF 0x0006 0x0"])
+    if (device.data.model in ['TS0726']) {
+        refreshTS0726()
+    }
 }
 
 /* groovylint-disable-next-line UnusedPrivateMethod */
@@ -544,7 +605,8 @@ void componentRefresh(DeviceWrapper childDevice) {
 void setupChildDevices() {
     logDebug 'Parent setupChildDevices'
     deleteObsoleteChildren()
-    Integer buttons = 0
+    int buttons = 0
+    int gangs = 0
     switch (device.data.model) {
         case 'SBM300Z6':
             buttons = 6
@@ -562,6 +624,9 @@ void setupChildDevices() {
             else {
                 buttons = 5
             }
+            break
+        case 'TS0726':  // Brazil 3+3 Zigbee Switch
+            buttons = 6
             break
         case 'TS0115':
         case 'SBM300Z5':
@@ -592,7 +657,9 @@ void setupChildDevices() {
         default:
             break
     }
-    logInfo "model: ${device.data.model} gangs:${buttons == 0 ? 1 : buttons} child devices: ${buttons}"
+    gangs = buttons == 0 ? 1 : buttons
+    state.gangs = gangs
+    logInfo "model: ${device.data.model} gangs:${gangs} child devices: ${buttons}"
     createChildDevices((int) buttons)
 }
 
@@ -704,14 +771,17 @@ void sendZigbeeCommands(List<String> cmds) {
     sendHubCommand(new hubitat.device.HubMultiAction(cmds, hubitat.device.Protocol.ZIGBEE))
 }
 
+/* groovylint-disable-next-line MethodParameterTypeRequired, NoDef */
 static Integer safeToInt(val, Integer defaultVal=0) {
     return "${val}"?.isInteger() ? "${val}".toInteger() : defaultVal
 }
 
+/* groovylint-disable-next-line MethodParameterTypeRequired, NoDef, NoDouble */
 static Double safeToDouble(val, Double defaultVal=0.0) {
     return "${val}"?.isDouble() ? "${val}".toDouble() : defaultVal
 }
 
+/* groovylint-disable-next-line MethodParameterTypeRequired, NoDef */
 static BigDecimal safeToBigDecimal(val, BigDecimal defaultVal=0.0) {
     return "${val}"?.isBigDecimal() ? "${val}".toBigDecimal() : defaultVal
 }
@@ -731,7 +801,8 @@ void logInfo(final String msg) {
     if (settings?.txtEnable) { log.info sDnMsg }
 }
 
-void powerOnState(final String relayMode) {
+/*
+void powerOnStateObsolete(final String relayMode) {
     List<String> cmds = []
     int modeEnum = 99
     switch (relayMode) {
@@ -752,51 +823,53 @@ void powerOnState(final String relayMode) {
     cmds += zigbee.writeAttribute(0x0006, 0x8002, DataType.ENUM8, modeEnum)
     sendZigbeeCommands(cmds)
 }
+*/
 
-void switchType(final String type) {
-    List<String> cmds = []
-    int modeEnum = 99
-    switch (type) {
-        case 'toggle':
-            modeEnum = 0
-            break
-        case 'state':
-            modeEnum = 1
-            break
-        case 'momentary':
-            modeEnum = 2
-            break
-        default:
-            log.error "${device.displayName} please select a Switch Type"
-            return
+void powerOnState(final String relayMode) {
+    Map<String, Integer> modeMap = PowerOnStateMap.collectEntries { k, v -> [(v): k] }
+    if (!modeMap.containsKey(relayMode)) {
+        log.error "${device.displayName} please select a Power On State option"
+        return
     }
-    logDebug("setting  Switch Type to: ${type} (${modeEnum})")
-    cmds += zigbee.writeAttribute(0xE001, 0xD030, DataType.ENUM8, modeEnum)
+    int modeEnum = modeMap[relayMode]
+    logDebug("setting  Power On State option to: ${relayMode}  (${modeEnum}")
+    List<String> cmds = zigbee.writeAttribute(0x0006, 0x8002, DataType.ENUM8, modeEnum)
     sendZigbeeCommands(cmds)
 }
 
-//  mode = value == 0 ? "Disabled"  : value == 1 ? "Lit when On" : value == 2 ? "Lit when Off" : null
-// [name:"ledMode",    type: "ENUM",   constraints: ["--- Select ---", "Disabled", "Lit when On", "Lit when Off], description: "Select LED Mode"]
+void switchType(final String type) {
+    Map<String, Integer> typeMap = SwitchTypeMap.collectEntries { k, v -> [(v): k] }
+    if (!typeMap.containsKey(type)) {
+        log.error "${device.displayName} please select a Switch Type option"
+        return
+    }
+    int modeEnum = typeMap[type]
+    logDebug("setting  Switch Type to: ${type} (${modeEnum})")
+    List<String> cmds = zigbee.writeAttribute(0xE001, 0xD030, DataType.ENUM8, modeEnum)
+    sendZigbeeCommands(cmds)
+}
 
 void ledMode(final String mode) {
-    List<String> cmds = []
-    int modeEnum = 99
-    switch (mode) {
-        case 'Disabled':
-            modeEnum = 0
-            break
-        case 'Lit when On':
-            modeEnum = 1
-            break
-        case 'Lit when Off':
-            modeEnum = 2
-            break
-        default:
-            log.error "${device.displayName} please select a LED mode option"
-            return
+    Map<String, Integer> modeMap = LedModeMap.collectEntries { k, v -> [(v): k] }
+    if (!modeMap.containsKey(mode)) {
+        log.error "${device.displayName} please select a LED mode option"
+        return
     }
+    int modeEnum = modeMap[mode]
     logDebug("setting  LED mode option to: ${mode}  (${modeEnum})")
-    cmds += zigbee.writeAttribute(0x0006, 0x8001, DataType.ENUM8, modeEnum)
+    List<String> cmds = zigbee.writeAttribute(0x0006, 0x8001, DataType.ENUM8, modeEnum)
+    sendZigbeeCommands(cmds)
+}
+
+void switchBacklight(final String mode) {
+    Map<String, Integer> modeMap = SwitchBacklightMap.collectEntries { k, v -> [(v): k] }
+    if (!modeMap.containsKey(mode)) {
+        log.error "${device.displayName} please select a Switch Backlight option"
+        return
+    }
+    int modeEnum = modeMap[mode]
+    logDebug("setting  Switch Backlight option to: ${mode}  (${modeEnum})")
+    List<String> cmds = zigbee.writeAttribute(0x0006, 0x5000, DataType.ENUM8, modeEnum)
     sendZigbeeCommands(cmds)
 }
 
@@ -806,6 +879,7 @@ void processOnOfClusterOtherAttr(final Map it) {
     String attrName = null
     Integer value = null
     String valueStr = it.value
+    Map eventMap = [:]
     try {
         value = Integer.parseInt(it.value)
     }
@@ -816,9 +890,17 @@ void processOnOfClusterOtherAttr(final Map it) {
     //log.trace "clusterPlusAttr = ${clusterPlusAttr}"
     switch (clusterPlusAttr) {
         case '0006_4001':
-        case '0006_4002':
-            attrName = 'attribute ' + clusterPlusAttr
+            attrName = 'On Time ' + clusterPlusAttr
             mode = value.toString()
+            break
+        case '0006_4002':
+            attrName = 'Off Wait Time ' + clusterPlusAttr
+            mode = value.toString()
+            break
+        case '0006_5000':
+            attrName = 'Switch Backlight'
+            mode = SwitchBacklightMap[value]
+            eventMap = [name: 'switchBacklight', value: mode]
             break
         case '0006_8000':
             attrName = 'Child Lock'
@@ -826,15 +908,33 @@ void processOnOfClusterOtherAttr(final Map it) {
             break
         case '0006_8001':
             attrName = 'LED mode'
-            mode = value == 0 ? 'Disabled' : value == 1 ? 'Lit when On' : value == 2 ? 'Lit when Off' : null
+            mode = LedModeMap[value]
+            eventMap = [name: 'ledMode', value: mode]
             break
         case '0006_8002':
             attrName = 'Power On State'
-            mode = value == 0 ? 'off' : value == 1 ? 'on' : value == 2 ? 'Last state' : null
+            mode = PowerOnStateMap[value]
+            eventMap = [name: 'powerOnState', value: mode]
             break
         case 'E000_D001':
         case 'E000_D002':
         case 'E000_D003':   // encoding:42, command:0A, value:AAAA,
+            attrName = 'attribute ' + clusterPlusAttr
+            mode = value == null ? valueStr : value.toString()
+            break
+        case 'E000_D004':
+            attrName = 'Tuya Scene ID ' + clusterPlusAttr
+            mode = value == null ? valueStr : value.toString()
+            break
+        case 'E000_D005':
+            attrName = 'Tuya Group ID ' + clusterPlusAttr
+            mode = value == null ? valueStr : value.toString()
+            break
+        case 'E001_D010':
+            attrName = 'attribute ' + clusterPlusAttr
+            mode = value == null ? valueStr : value.toString()
+            break
+        case 'E001_D020':
             attrName = 'attribute ' + clusterPlusAttr
             mode = value == null ? valueStr : value.toString()
             break
@@ -847,6 +947,11 @@ void processOnOfClusterOtherAttr(final Map it) {
             return
     }
     if (logEnable) { log.info "${device.displayName} ${attrName} is: ${mode} (${value != null ? value : '?'})" }
+    if (eventMap.size() > 0) {
+        eventMap.descriptionText = "${eventMap.name} is ${eventMap.value} (${value != null ? value : '?'})"
+        sendEvent(eventMap)
+        logInfo "${eventMap.descriptionText}"
+    }
 }
 
 void test(final String description) {
