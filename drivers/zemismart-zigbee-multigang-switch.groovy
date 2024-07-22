@@ -48,6 +48,8 @@
  *  Ver. 1.0.0  2024-05-01 kkossev - first version pushed to HPM
  *  Ver. 1.1.0  2024-05-02 kkossev - added TS0726 _TZ3000_kt6xxa4o; added switchBacklight command; added TS0001 _TZ3000_ovyaisip; TS0001 _TZ3000_4rbqgcuv; TS0002 _TZ3000_kgxej1dv; TS0003 _TZ3000_qxcnwv26;
  *  Ver. 1.1.1  2024-05-05 kkossev - (dev. branch) added toggle command; added more TS0726 fingerprints; added TS1002 _TZ3000_xa9g7rxs (a weird device!); added _TZ3000_hznzbl0x _TZ3000_mtnpt6ws _TZ3000_pxfjrzyj _TZ3000_pk8tgtdb _TZ3000_ywubfuvt _TZ3000_yervjnlj _TZ3000_f09j9qjb tnx @Gabriel
+ *  Ver. 1.1.2  2024-07-22 hhorigian - (dev. branch) added  TS000F _TZ3000_m8f3z8ju, 2 Gang Relay. 
+
  *
  *                                   TODO: automatic logsOff()
  *                                   TODO: add healthCheck
@@ -60,8 +62,8 @@ import groovy.transform.Field
 import com.hubitat.app.DeviceWrapper
 import com.hubitat.app.ChildDeviceWrapper
 
-static String version() { '1.1.1' }
-static String timeStamp() { '2024/05/04 7:31 AM' }
+static String version() { '1.1.2' }
+static String timeStamp() { '2024/07/22 4:20 PM' }
 
 @Field static final Boolean debug = false
 @Field static final Integer MAX_PING_MILISECONDS = 10000     // rtt more than 10 seconds will be ignored
@@ -239,6 +241,9 @@ metadata {
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,E000,E001', outClusters:'0019,000A', model:'TS0726', manufacturer:'_TZ3002_sal078g8', deviceJoinName: 'TS0726 switches/scenes'      // not tested
         //
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0004,1000,E001', outClusters:'0019,000A,0003,0004,0005,0006,0008,0300,1000', model:'TS1002', manufacturer:'_TZ3000_xa9g7rxs', deviceJoinName: 'Tuya TS1002 switch'
+        //
+        fingerprint profileId: '0104', endpointId: '01', inClusters: '0004,0005,0006,E000,E001,0000', outClusters: '0019,000A', model: 'TS000F', manufacturer: '_TZ3000_m8f3z8ju', deviceJoinName: 'Tuya Zigbee Switch 2 Gang' // BRazil 2CH Zigbee        
+
     }
     preferences {
         input(name: 'txtEnable', type: 'bool', title: 'Enable description text logging', defaultValue: true)
@@ -705,6 +710,7 @@ void setupChildDevices() {
         case 'SBM300Z2':
         case 'SIN-4-2-20':
         case 'SIN-4-2-20_PRO':
+        case 'TS000F':          
             buttons = 2
             break
         case 'TS0011':
