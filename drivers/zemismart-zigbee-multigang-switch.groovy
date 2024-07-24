@@ -49,7 +49,6 @@
  *  Ver. 1.1.0  2024-05-02 kkossev - added TS0726 _TZ3000_kt6xxa4o; added switchBacklight command; added TS0001 _TZ3000_ovyaisip; TS0001 _TZ3000_4rbqgcuv; TS0002 _TZ3000_kgxej1dv; TS0003 _TZ3000_qxcnwv26;
  *  Ver. 1.1.1  2024-05-05 kkossev - (dev. branch) added toggle command; added more TS0726 fingerprints; added TS1002 _TZ3000_xa9g7rxs (a weird device!); added _TZ3000_hznzbl0x _TZ3000_mtnpt6ws _TZ3000_pxfjrzyj _TZ3000_pk8tgtdb _TZ3000_ywubfuvt _TZ3000_yervjnlj _TZ3000_f09j9qjb tnx @Gabriel
  *  Ver. 1.1.2  2024-07-22 hhorigian - (dev. branch) added  TS000F _TZ3000_m8f3z8ju, 2 Gang Relay. 
-
  *
  *                                   TODO: automatic logsOff()
  *                                   TODO: add healthCheck
