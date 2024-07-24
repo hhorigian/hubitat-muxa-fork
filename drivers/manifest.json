@@ -1,0 +1,19 @@
+{
+ "packageName":"Zemismart ZigBee Wall Switch Multi-Gang",
+ "author":"Muxa, kkossev",
+ "version":"1.1.0",
+ "minimumHEVersion":"2.3.7.100",
+ "dateReleased":"2024-05-03",
+ "releaseNotes":"1.1.0  2024-05-02 - added TS0726 _TZ3000_kt6xxa4o; added switchBacklight command; added TS0001 _TZ3000_ovyaisip; TS0001 _TZ3000_4rbqgcuv; TS0002 _TZ3000_kgxej1dv; TS0003 _TZ3000_qxcnwv26;\n1.0.0  2024-05-01 - first version pushed to HPM",
+ "documentationLink":"https://community.hubitat.com/t/zemismart-zigbee-1-2-3-4-gang-light-switches/21124/36?u=kkossev",
+ "communityLink":"https://community.hubitat.com/t/zemismart-zigbee-1-2-3-4-gang-light-switches/21124/36?u=kkossev",
+ "drivers": [
+  {
+     "id":"cee0de03-7068-4e9b-92a3-9d522d28846b",
+     "name":"Zemismart ZigBee Wall Switch Multi-Gang",
+	 "namespace": "muxa",
+     "location":"https://raw.githubusercontent.com/kkossev/hubitat-muxa-fork/master/drivers/zemismart-zigbee-multigang-switch.groovy",
+     "required":true
+  }
+  ]
+}
