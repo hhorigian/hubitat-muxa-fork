@@ -63,8 +63,8 @@ import groovy.transform.Field
 import com.hubitat.app.DeviceWrapper
 import com.hubitat.app.ChildDeviceWrapper
 
-static String version() { '1.1.3' }
-static String timeStamp() { '2024/07/24 9:28 PM' }
+static String version() { '1.1.4' }
+static String timeStamp() { '2024/11/25 1:28 PM' }
 
 @Field static final Boolean debug = false
 @Field static final Integer MAX_PING_MILISECONDS = 10000     // rtt more than 10 seconds will be ignored
