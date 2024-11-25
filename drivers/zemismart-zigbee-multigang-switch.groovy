@@ -50,6 +50,7 @@
  *  Ver. 1.1.1  2024-05-05 kkossev - added toggle command; added more TS0726 fingerprints; added TS1002 _TZ3000_xa9g7rxs (a weird device!); added _TZ3000_hznzbl0x _TZ3000_mtnpt6ws _TZ3000_pxfjrzyj _TZ3000_pk8tgtdb _TZ3000_ywubfuvt _TZ3000_yervjnlj _TZ3000_f09j9qjb tnx @Gabriel
  *  Ver. 1.1.2  2024-07-22 hhorigian - added  TS000F _TZ3000_m8f3z8ju, 2 Gang Relay.
  *  Ver. 1.1.3  2024-07-24 kkossev - merged dev. branch to main branch
+ *  Ver. 1.1.4  2024-11-25 hhorigian - addded TS0006 _TZ3000_kw8pmgbe, 6BTN Novadigital Keypad
  *
  *                                   TODO: automatic logsOff()
  *                                   TODO: add healthCheck
@@ -259,6 +260,7 @@ metadata {
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,E000,E001', outClusters:'0019,000A', model:'TS0726', manufacturer:'_TZ3002_phu8ygaw', deviceJoinName: 'TS0726 switches/scenes'      // not tested
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0003,0004,0005,0006,E000,E001', outClusters:'0019,000A', model:'TS0726', manufacturer:'_TZ3002_sal078g8', deviceJoinName: 'TS0726 switches/scenes'      // not tested
         //
+        fingerprint profileId:'0104', endpointId:'01', inClusters:'0004,0005,0006,E000,0000', outClusters: '0019,000A', model: 'TS0006', manufacturer: '_TZ3000_kw8pmgbe', deviceJoinName: 'NovaDigital Zigbee Switch 6BTN' // NOVADIGITAL        
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0000,0001,0003,0004,1000,E001', outClusters:'0019,000A,0003,0004,0005,0006,0008,0300,1000', model:'TS1002', manufacturer:'_TZ3000_xa9g7rxs', deviceJoinName: 'Tuya TS1002 switch'
         fingerprint profileId:'0104', endpointId:'01', inClusters:'0004,0005,0006,E000,E001,0000', outClusters:'0019,000A', model:'TS000F', manufacturer:'_TZ3000_m8f3z8ju', deviceJoinName: 'Tuya Zigbee Switch 2 Gang'        // BRazil 2CH Zigbee
     }
@@ -705,6 +707,7 @@ void setupChildDevices() {
             }
             break
         case 'TS0726':  // Brazil 3+3 Zigbee Switch
+        case 'TS0006':
             buttons = 6
             break
         case 'TS0115':
